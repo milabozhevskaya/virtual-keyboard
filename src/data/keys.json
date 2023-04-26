@@ -5,12 +5,12 @@
     "en": {
       "value": "~",
       "value_shift": "`",
-      "name": ["`", "~"]
+      "name": ["~", "`"]
     },
     "ru": {
       "value": "ё",
       "value_shift": "Ё",
-      "name": ["`", "~"]
+      "name": ["~", "`"]
     },
     "row": 1,
     "color": "dark"
@@ -21,12 +21,12 @@
     "en": {
       "value": "1",
       "value_shift": "!",
-      "name": ["!", "1"]
+      "name": ["1", "!"]
     },
     "ru": {
       "value": "1",
       "value_shift": "!",
-      "name": ["!", "1"]
+      "name": ["1", "!"]
     },
     "row": 1,
     "color": "light"
@@ -37,12 +37,12 @@
     "en": {
       "value": "2",
       "value_shift": "@",
-      "name": ["@", "2"]
+      "name": ["2", "@"]
     },
     "ru": {
       "value": "2",
       "value_shift": "\"",
-      "name": ["\"", "2"]
+      "name": ["2", "\""]
     },
     "row": 1,
     "color": "light"
@@ -53,12 +53,12 @@
     "en": {
       "value": "3",
       "value_shift": "#",
-      "name": ["#", "3"]
+      "name": ["3", "#"]
     },
     "ru": {
       "value": "3",
       "value_shift": "№",
-      "name": ["№", "3"]
+      "name": ["3", "№"]
     },
     "row": 1,
     "color": "light"
@@ -69,12 +69,12 @@
     "en": {
       "value": "4",
       "value_shift": "$",
-      "name": ["$", "4"]
+      "name": ["4", "$"]
     },
     "ru": {
       "value": "4",
       "value_shift": ";",
-      "name": [";", "4"]
+      "name": ["4", ";"]
     },
     "row": 1,
     "color": "light"
@@ -85,12 +85,12 @@
     "en": {
       "value": "5",
       "value_shift": "%",
-      "name": ["%", "5"]
+      "name": ["5", "%"]
     },
     "ru": {
       "value": "5",
       "value_shift": "%",
-      "name": ["%", "5"]
+      "name": ["5", "%"]
     },
     "row": 1,
     "color": "light"
@@ -101,12 +101,12 @@
     "en": {
       "value": "6",
       "value_shift": "^",
-      "name": ["^", "6"]
+      "name": ["6", "^"]
     },
     "ru": {
       "value": "6",
       "value_shift": ":",
-      "name": [":", "6"]
+      "name": ["6", ":"]
     },
     "row": 1,
     "color": "light"
@@ -117,12 +117,12 @@
     "en": {
       "value": "7",
       "value_shift": "&",
-      "name": ["&", "7"]
+      "name": ["7", "&"]
     },
     "ru": {
       "value": "7",
       "value_shift": "?",
-      "name": ["?", "7"]
+      "name": ["7", "?"]
     },
     "row": 1,
     "color": "light"
@@ -133,12 +133,12 @@
     "en": {
       "value": "8",
       "value_shift": "*",
-      "name": ["*", "8"]
+      "name": ["8", "*"]
     },
     "ru": {
       "value": "8",
       "value_shift": "*",
-      "name": ["*", "8"]
+      "name": ["8", "*"]
     },
     "row": 1,
     "color": "light"
@@ -149,12 +149,12 @@
     "en": {
       "value": "9",
       "value_shift": "(",
-      "name": ["(", "9"]
+      "name": ["9", "("]
     },
     "ru": {
-      "value": "0",
+      "value": "9",
       "value_shift": "(",
-      "name": ["(", "0"]
+      "name": ["9","("]
     },
     "row": 1,
     "color": "light"
@@ -163,14 +163,14 @@
     "type": "symbol",
     "code": "Digit0",
     "en": {
-      "value": "9",
+      "value": "0",
       "value_shift": ")",
-      "name": [")", "0"]
+      "name": ["0", ")"]
     },
     "ru": {
-      "value": "9",
+      "value": "0",
       "value_shift": ")",
-      "name": [")", "0"]
+      "name": ["0", ")"]
     },
     "row": 1,
     "color": "light"
@@ -181,12 +181,12 @@
     "en": {
       "value": "-",
       "value_shift": "_",
-      "name": ["_", "-"]
+      "name": ["-", "_"]
     },
     "ru": {
       "value": "-",
       "value_shift": "_",
-      "name": ["_", "-"]
+      "name": ["-", "_"]
     },
     "row": 1,
     "color": "light"
@@ -197,12 +197,12 @@
     "en": {
       "value": "=",
       "value_shift": "+",
-      "name": ["+", "="]
+      "name": ["=", "+"]
     },
     "ru": {
       "value": "=",
       "value_shift": "+",
-      "name": ["+", "="]
+      "name": ["=", "+"]
     },
     "row": 1,
     "color": "light"
@@ -401,7 +401,7 @@
     "en": {
       "value": "[",
       "value_shift": "{",
-      "name": ["{", "["]
+      "name": ["[", "{"]
     },
     "ru": {
       "value": "х",
@@ -417,7 +417,7 @@
     "en": {
       "value": "]",
       "value_shift": "}",
-      "name": ["}", "]"]
+      "name": ["]", "}"]
     },
     "ru": {
       "value": "ъ",
@@ -433,12 +433,12 @@
     "en": {
       "value": "\\",
       "value_shift": "|",
-      "name": ["|", "\\"]
+      "name": ["\\", "|"]
     },
     "ru": {
       "value": "\\",
       "value_shift": "/",
-      "name": ["/", "\\"]
+      "name": ["\\", "/"]
     },
     "row": 2,
     "color": "light"
@@ -617,7 +617,7 @@
     "en": {
       "value": ";",
       "value_shift": ":",
-      "name": [":", ";"]
+      "name": [";", ":"]
     },
     "ru": {
       "value": "ж",
@@ -633,7 +633,7 @@
     "en": {
       "value": "'",
       "value_shift": "\"",
-      "name": ["\"", "'"]
+      "name": ["'", "\""]
     },
     "ru": {
       "value": "э",
@@ -789,7 +789,7 @@
     "en": {
       "value": ",",
       "value_shift": "<",
-      "name": ["<", ","]
+      "name": [",", "<"]
     },
     "ru": {
       "value": "б",
@@ -805,7 +805,7 @@
     "en": {
       "value": ".",
       "value_shift": ">",
-      "name": [">", "."]
+      "name": [".", ">"]
     },
     "ru": {
       "value": "ю",
@@ -821,12 +821,12 @@
     "en": {
       "value": "/",
       "value_shift": "?",
-      "name": ["?", "/"]
+      "name": ["/", "?"]
     },
     "ru": {
       "value": ".",
       "value_shift": ",",
-      "name": [",", "."]
+      "name": [".", ","]
     },
     "row": 4,
     "color": "light"

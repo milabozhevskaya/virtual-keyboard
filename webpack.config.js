@@ -3,6 +3,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const isProduction = process.env.NODE_ENV == 'production';
 
@@ -26,7 +27,12 @@ const config = {
         new HtmlWebpackPlugin({
             template: './src/index.html',
         }),
-
+        new CopyPlugin({
+            patterns: [
+              { from: './src/data/keys.json', to: './data/keys.json' },
+            ],
+          }),
+      
         // Add your plugins here
         // Learn more about plugins from https://webpack.js.org/configuration/plugins/
     ],
@@ -62,8 +68,16 @@ const config = {
                 test: /\.(svg)$/i,
                 type: 'asset/source',
             },
-            {   test: /\.json$/, type: 'json' },
+            // {   test: /\.json$/, type: 'json' },
+            // {   test: /\.json$/, type: 'asset/resource' },
+            {
+                test: /\.json$/,
+                loader: 'file-loader',
+                type: 'javascript/auto'
+            },
 
+            // {test: /\.json$/,                                                       
+            // loader: 'file-loader?name=[name].json' }
             // Add your rules for custom modules here
             // Learn more about loaders from https://webpack.js.org/loaders/
         ],
