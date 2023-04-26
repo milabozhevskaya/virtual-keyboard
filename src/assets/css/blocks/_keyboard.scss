@@ -1,0 +1,29 @@
+.keyboard {
+  position: relative;
+  min-height: 100vh;
+  @include dflex(cn, cn, column);
+  margin: 0 auto;
+  transition: opacity .1s;
+  opacity: 1;
+
+  &.hide {
+    opacity: 0;
+    transition: opacity .8s;
+  }
+
+  &__header {
+    // width: 940px;
+    margin-bottom: 10px;
+  }
+
+  &__note {
+    width: 940px;
+    @include dflex(cn, cn);
+    color: rgba(255, 255, 255, .9);
+    font-size: 14px;
+    font-family: consolas;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-top: 10px;
+  }
+}

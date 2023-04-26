@@ -22,8 +22,8 @@ class Board extends Element {
     data.forEach((btn, index) => {
       const { row } = btn;
       this.btns.push(new Button({
-        parent: this.node,
-        className: `board__row row`,
+        parent: this.rows[row - 1].node,
+        className: `board`,
         lang: this.lang,
         data: btn,
       }));

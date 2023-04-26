@@ -13,12 +13,12 @@ class Header extends Element {
     });
     this.lang = new Element({
         parent: this.container.node,
-        className: `${className}__lang lang`,
+        className: `header__lang lang`,
         content: lang,
     });
     this.description = new Element({
         parent: this.container.node,
-        className: `${className}__description description`,
+        className: `header__description description`,
         content: `
         <span>Virtual Keyboard реализована для Window OS</span>
         <span>Для зажатия контрольной кнопки используйте двойной клик</span>

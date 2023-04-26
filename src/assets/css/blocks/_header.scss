@@ -1,0 +1,26 @@
+.header {
+  width: 100%;
+  @include dflex(sb, fe);
+  color: rgba(255, 255, 255, .9);
+  font-size: 14px;
+  font-family: consolas;
+  letter-spacing: 1px;
+  font-weight: 600;
+  
+  &__container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  &__lang {
+    font-size: 32px;
+    margin-right: 15px;
+  }
+
+  &__description {
+    @include dflex(fe, fs, column);
+    row-gap: 7px;
+  }
+
+}

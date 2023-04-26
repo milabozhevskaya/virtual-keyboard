@@ -5,7 +5,7 @@ class Button extends Element {
     super({ 
         parent,
         tagName: 'button',
-        className: `${className}__btn btn` ,
+        className: `${className}__btn btn ${data.code}` ,
     });
     this.lang = lang;
     this.data = data;
