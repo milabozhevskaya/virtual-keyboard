@@ -12,6 +12,10 @@ class Textarea extends Element {
     });
     this.node.focus();
   }
+  
+  setContent = (content) => {
+    this.node.textContent = content;
+  }
 }
 
 export { Textarea };

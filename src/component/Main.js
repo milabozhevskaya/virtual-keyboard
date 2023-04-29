@@ -3,12 +3,14 @@ import { Textarea } from './Textarea';
 import { Board } from './Board';
 
 class Main extends Element {
-  constructor({ parent, className }) {
+  constructor({ parent, className, controller }) {
     super({ 
-        parent, 
-        tagName: 'main', 
-        className: `${className}__main main` ,
+      parent, 
+      tagName: 'main', 
+      className: `${className}__main main` ,
     });
+    this.controller = controller;
+    console.log(this.controller.boardHandler);
     this.container = new Element({
       parent: this.node,
       className: `main__container container`,
@@ -20,12 +22,21 @@ class Main extends Element {
     this.board = new Board({
         parent: this.container.node,
         className,
-        lang: 'en'
+        lang: 'en',
+        controller: this.controller.boardHandler,
     });
   }
   
-  init = (data) => {
-    this.board.init(data);
+  init = (keys) => {
+    this.board.init(keys);
+  }
+  
+  onChangeTextareaContent = (content) => {
+    this.textarea.setContent(content);
+  };
+  
+  onInitKeys = (keys) => {
+    this.board.init(keys);
   }
 }
 
