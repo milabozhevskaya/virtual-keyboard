@@ -10,7 +10,6 @@ class Main extends Element {
       className: `${className}__main main` ,
     });
     this.controller = controller;
-    console.log(this.controller.boardHandler);
     this.container = new Element({
       parent: this.node,
       className: `main__container container`,
@@ -25,6 +24,12 @@ class Main extends Element {
         lang: 'en',
         controller: this.controller.boardHandler,
     });
+    this.node.onmousedown = (event) => {
+      this.textarea.node.focus();
+    };
+    this.node.onmouseup = (event) => {
+      this.textarea.node.focus();
+    }
   }
   
   init = (keys) => {

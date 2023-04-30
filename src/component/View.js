@@ -8,7 +8,6 @@ class View extends Element {
     super({ parent, className: 'keyboard' });
     this.controller = controller;
     this.store = store;
-    console.log(store)
     this.data = [];
     this.keys = [];
     this.header = new Header({
@@ -21,8 +20,10 @@ class View extends Element {
         className: 'keyboard',
         controller: this.controller,
     });
-    document.addEventListener('keydown', (e) => this.controller.keyDown(e));
-    document.addEventListener('keyup', (e) => this.controller.keyUp(e));
+    document.addEventListener('keydown', (event) => this.controller.keyDown(event.code), true);
+    document.addEventListener('keyup', (event) => this.controller.keyUp(event.code), true);
+    // this.main.node.addEventListener('keydown', (event) => this.controller.keyDown(event.code), true);
+    // this.main.node.addEventListener('keyup', (event) => this.controller.keyUp(event.code), true);
     this.store.onChangeTextareaContent.add((content) => this.main.onChangeTextareaContent(content));
     this.store.onInitKeys.add((keys) => this.main.onInitKeys(keys));
   }

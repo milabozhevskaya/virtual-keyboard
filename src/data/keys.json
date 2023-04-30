@@ -223,13 +223,13 @@
     "type": "space",
     "code": "Tab",
     "en": {
-      "value": " ",
-      "value_shift": " ",
+      "value": "    ",
+      "value_shift": "    ",
       "name": ["Tab"]
     },
     "ru": {
-      "value": " ",
-      "value_shift": " ",
+      "value": "    ",
+      "value_shift": "    ",
       "name": ["Tab"]
     },
     "row": 2,

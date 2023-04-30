@@ -9,6 +9,7 @@ class Store {
     this._lastControl = { id: null, time: null };
     this._activeControls = {};
     this._lastKey = null;
+    this._capsLock = false;
   }
   
   get textareaContent() {
@@ -71,6 +72,14 @@ class Store {
   
   set lastKey(newLastKey) {
     this._lastKey = newLastKey;
+  }
+  
+  get capsLock() {
+    return this._capsLock;
+  }
+  
+  set capsLock(flag) {
+    this._capsLock = flag;
   }
   
   onChangeTextareaContent = new Signal();
