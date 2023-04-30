@@ -1,20 +1,25 @@
 import { Editor } from "./Editor";
 import { Add } from './command/Add';
 import { Delete } from './command/Delete';
+import { History } from "./EditHistory";
 
 class Controller {
   constructor(store) {
     this.store = store;
     this.editor = new Editor();
     // this.cursor = new Cursor(this.state);
-    this.history = [];
+    this.history = new History({
+      backupTextareaContent: '',
+      backupCursor: { line: 0, pos: 0, number: 0 },
+      backupTextareaRow: [''],
+    });
     this.activeBtns = {};
     this.lastControl = { id: null, time: null };
     this.activeControls = {};
     this.lastKey = null;
     this.newSymbol = null;
   }
-  
+
   controlCombinations = [
     ['Control', 'Delete'],
     ['Control', 'Backspace'],
@@ -35,27 +40,27 @@ class Controller {
     ['Control', 'KeyY'],
     ['Control', 'Shift'],
   ];
-  
-  excludeKey = ['F1','F2','F3','F4','F5','F6','F7','F8','F9','F10','F11','F12']
-  
+
+  excludeKey = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+
   hasActiveShift = () => {
     const activeKeys = Object.keys(this.activeControls)
       .filter((i) => this.activeControls[i] !== 0);
     return activeKeys.length === 1 && (activeKeys.includes('ShiftLeft') || activeKeys.includes('ShiftRight'));
   };
-  
+
   symbol = (code, { value, value_shift: shiftValue }) => {
     let symbol = '';
     if (code.includes('Key')) {
       symbol = (
         (this.hasActiveShift() && !this.store.capsLock) || (!this.hasActiveShift() && this.store.capsLock)
-        ) ? shiftValue : value;
+      ) ? shiftValue : value;
     }
     else symbol = this.hasActiveShift() ? shiftValue : value;
-    
-    this.addTextareaContent(symbol);
+
+    this.add(symbol);
   };
-  
+
   delete = (code, { value }) => {
     this.deleteDirection = code === 'Backspace' ? 'prev' : 'next';
     this.editor.textareaContent = this.store.textareaContent;
@@ -69,9 +74,9 @@ class Controller {
   };
 
   space = (code, { value }) => {
-    this.addTextareaContent(value);
+    this.add(value);
   };
-  
+
   capsLock = (code, { value }) => {
     const caps = this.store.capsLock;
     this.store.capsLock = !caps;
@@ -83,7 +88,7 @@ class Controller {
     return true;
   }
 
-  addTextareaContent = (symbol) => {
+  add = (symbol) => {
     this.newSymbol = symbol;
     this.editor.textareaContent = this.store.textareaContent;
     this.editor.textareaRow = this.store.textareaRow;
@@ -106,10 +111,10 @@ class Controller {
     // this.lastControl = this.store.lastControl;
     // this.activeControls = this.store.activeControls;
     // this.lastKey = this.store.lastKey;
-    
+
     if (type === 'control') {
       if ((this.lastControl.id && this.lastControl.id === code)
-      && (this.lastControl.time && ((time - this.lastControl.time) < 300))) {
+        && (this.lastControl.time && ((time - this.lastControl.time) < 300))) {
         // если последняя контольная есть и совпадает с пришедшей 
         // и отличие во времени меньше 300 мсек
         // то добавляем в активные контролы
@@ -175,7 +180,7 @@ class Controller {
     }
     this.store.activeBtns = this.activeBtns;
   }
-  
+
   mouseUp = (code, time) => {
     // console.log(code);
     const lang = this.store.lang[this.store.langIndex];
@@ -206,9 +211,9 @@ class Controller {
     }
     this.store.activeBtns = this.activeBtns;
   }
-  
+
   resetControls = () => { this.activeControls = {}; };
-  
+
   hasControlCombination(code) {
     const controlsKeys = Object.keys(this.activeControls)
       .filter((i) => (this.activeControls[i] !== 0));
@@ -222,19 +227,26 @@ class Controller {
       });
     for (let i = 0; i < this.controlCombinations.length; i += 1) {
       if (this.controlCombinations[i].every((l) => (activeControlsKeys.includes(l)))) {
-        console.log(activeControlsKeys);
         if (this.controlCombinations[i].join('') === 'ControlShift') {
           const langIndex = this.store.langIndex;
           this.store.langIndex = (langIndex + 1) % this.store.lang.length;
           // localStorage.setItem('key_lang', lang);
         }
         if (this.controlCombinations[i].join('') === 'ControlKeyZ') {
-          // const backCommand = this.history.history.pop();
-          // if (backCommand) {
-          //   this.state.set(backCommand.backup);
-          //   this.state.setCursor(backCommand.backCursor);
-          //   this.state.setTextRow(backCommand.textRow);
-          // }
+          const backCommand = this.history.back();
+          if (backCommand) {
+            this.store.textareaContent = backCommand.backupTextareaContent;
+            this.store.cursor = backCommand.backupCursor;
+            this.store.textareaRow = backCommand.textareaRow;
+          }
+        }
+        if (this.controlCombinations[i].join('') === 'ControlKeyY') {
+          const backCommand = this.history.next();
+          if (backCommand) {
+            this.store.textareaContent = backCommand.backupTextareaContent;
+            this.store.cursor = backCommand.backupCursor;
+            this.store.textareaRow = backCommand.textareaRow;
+          }
         }
         return this.controlCombinations[i];
       }
@@ -243,7 +255,7 @@ class Controller {
   }
 
   hasControls = () => Object.keys(this.activeControls)
-      .filter((i) => this.activeControls[i] !== 0).length !== 0;
+    .filter((i) => this.activeControls[i] !== 0).length !== 0;
 
   keyDown = (code) => {
     if (this.excludeKey.includes(code)) return;
@@ -273,7 +285,7 @@ class Controller {
       } else {
         if (type === 'meta' || !this.editMap[type]);
         else this.editMap[type](code, key[lang]);
-          this.activeBtns[code] = 1;
+        this.activeBtns[code] = 1;
       }
     } else {
       this.activeBtns[code] = 1;
@@ -283,10 +295,10 @@ class Controller {
     this.store.activeBtns = this.activeBtns;
   }
 
-  
+
   keyUp = (code) => {
     if (this.excludeKey.includes(code)) return;
-    
+
     const lang = this.store.lang[this.store.langIndex];
     const key = this.store.getKeyContent(code);
     const { type } = key;
@@ -306,7 +318,7 @@ class Controller {
     }
     this.store.activeBtns = this.activeBtns;
   }
-  
+
   upCursor = () => {
     console.log(this.store.cursor)
     const { line, pos, number } = this.store.cursor;
@@ -314,13 +326,13 @@ class Controller {
     if (line !== 0) {
       const newLine = line - 1;
       let newNumber = 0;
-      
+
       if (newLine > 0) {
         for (let i = 0; i < newLine; i++) {
           newNumber += textareaRow[i].length;
         }
       }
-      
+
       if (textareaRow[newLine].length > pos) {
         newNumber += pos;
         this.store.cursor = {
@@ -339,9 +351,9 @@ class Controller {
 
     }
     console.log(this.store.cursor)
-    
+
   };
-  
+
   downCursor = () => {
     console.log(this.store.cursor);
     const { line, pos, number } = this.store.cursor;
@@ -377,7 +389,7 @@ class Controller {
     console.log(this.store.cursor);
 
   };
-  
+
   leftCursor = () => {
     const { line, pos, number } = this.store.cursor;
     const textareaRow = this.store.textareaRow;
@@ -388,7 +400,7 @@ class Controller {
         for (let i = 0; i < line; i++) {
           newNumber += textareaRow[i].length;
         }
-      } 
+      }
       this.store.cursor = {
         number: newNumber,
         line,
@@ -416,11 +428,11 @@ class Controller {
     }
 
   };
-  
+
   rightCursor = () => {
     const { line, pos, number } = this.store.cursor;
     const textareaRow = this.store.textareaRow;
-    
+
     if (number === this.store.textareaContent.length) return;
     if (pos + 1 === textareaRow[line].length) {
       this.store.cursor = {
@@ -437,7 +449,7 @@ class Controller {
 
     }
   }
-  
+
   editMap = {
     'symbol': this.symbol,
     'delete': this.delete,
@@ -445,23 +457,23 @@ class Controller {
     'capslock': this.capsLock,
     'space': this.space,
   }
-  
+
   cursorHandler = {
     'up': this.upCursor,
     'down': this.downCursor,
     'left': this.leftCursor,
     'right': this.rightCursor,
   }
-  
+
   keyHandler = {
     mouseDown: this.mouseDown,
     mouseUp: this.mouseUp,
   };
-  
+
   boardHandler = {
     keyHandler: this.keyHandler,
   };
-  
+
   initKeyboard = (data) => {
     const keys = {};
     data.forEach((key) => {
@@ -471,10 +483,10 @@ class Controller {
     });
     this.store.keys = keys;
   };
-  
+
   executeCommand(command) {
     if (command.execute()) {
-      this.history.push(command);
+      this.history.save(command);
     }
   }
 

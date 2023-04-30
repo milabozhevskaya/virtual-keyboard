@@ -94,7 +94,6 @@ class Editor {
       //   };
       // }
     }
-    console.log(this.cursor)
   }
   
   findCursorPosition = (number) => {
@@ -165,27 +164,27 @@ class Editor {
     
   };
 
-  getSelect() {
-    return this.selectText;
-  }
+  // getSelect() {
+  //   return this.selectText;
+  // }
 
-  deleteSelect() {
-    this.selectText = '';
-  }
+  // deleteSelect() {
+  //   this.selectText = '';
+  // }
 
-  replaceSelect(selectText) {
-    this.selectText = selectText;
-  }
+  // replaceSelect(selectText) {
+  //   this.selectText = selectText;
+  // }
 
-  changeTextareaRow() {
-    const splitText = this.textareaContent.split('\n').map((row) => `${row}\n`);
-    if (splitText.length === 1) splitText[0] = splitText[0].slice(0, splitText[0].length - 1);
-    const textArr = splitText.map((row) => {
-      if (row.length <= this.maxRowLength) return row;
-      return row.match(/.{1,77}/g);
-    });
-    return textArr.flat();
-  }
+  // changeTextareaRow() {
+  //   const splitText = this.textareaContent.split('\n').map((row) => `${row}\n`);
+  //   if (splitText.length === 1) splitText[0] = splitText[0].slice(0, splitText[0].length - 1);
+  //   const textArr = splitText.map((row) => {
+  //     if (row.length <= this.maxRowLength) return row;
+  //     return row.match(/.{1,77}/g);
+  //   });
+  //   return textArr.flat();
+  // }
 }
 
 export { Editor };
