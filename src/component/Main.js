@@ -40,6 +40,10 @@ class Main extends Element {
     this.textarea.setContent(content);
   };
   
+  onChangeCursorPosition = ({ start, end }) => {
+    this.textarea.node.setSelectionRange(start, end);
+  };
+  
   onInitKeys = (keys) => {
     this.board.init(keys);
   }

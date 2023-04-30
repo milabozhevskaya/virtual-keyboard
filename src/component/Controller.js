@@ -1,11 +1,18 @@
+import { Editor } from "./Editor";
+import { Add } from './command/Add';
+import { Delete } from './command/Delete';
+
 class Controller {
   constructor(store) {
     this.store = store;
+    this.editor = new Editor();
+    // this.cursor = new Cursor(this.state);
+    this.history = [];
     this.activeBtns = {};
     this.lastControl = { id: null, time: null };
     this.activeControls = {};
     this.lastKey = null;
-
+    this.newSymbol = null;
   }
   
   controlCombinations = [
@@ -50,14 +57,15 @@ class Controller {
   };
   
   delete = (code, { value }) => {
-    // this.deleteDirection = code === 'Backspace' ? 'prev' : 'next';
-    // this.editor.text = this.state.get();
-    // this.editor.textRow = this.state.getTextRow();
-    // this.editor.cursor = this.state.getCursor();
-    // this.executeCommand(new DeleteCommand(this, this.editor));
-    // this.state.set(this.editor.text);
-    // this.state.setCursor(this.editor.cursor);
-    // this.state.setTextRow(this.editor.textRow);
+    this.deleteDirection = code === 'Backspace' ? 'prev' : 'next';
+    this.editor.textareaContent = this.store.textareaContent;
+    this.editor.textareaRow = this.store.textareaRow;
+    this.editor.cursor = this.store.cursor;
+    this.executeCommand(new Delete(this, this.editor));
+    this.store.textareaContent = this.editor.textareaContent;
+    this.store.textareaRow = this.editor.textareaRow;
+    this.store.cursor = this.editor.cursor;
+    this.deleteDirection = null;
   };
 
   space = (code, { value }) => {
@@ -69,20 +77,24 @@ class Controller {
     this.store.capsLock = !caps;
   };
 
-  move = (code, { value }) => {};
+  moveCursor = (code) => {
+    const direction = code.slice(5).toLowerCase();
+    this.cursorHandler[direction]();
+    return true;
+  }
 
   addTextareaContent = (symbol) => {
-    // this.addSymbol = symbol;
-    // this.editor.text = this.state.get();
-    // this.editor.textRow = this.state.getTextRow();
-    // this.editor.cursor = this.state.getCursor();
-    // this.executeCommand(new AddCommand(this, this.editor));
-    // this.state.set(this.editor.text);
-    // this.state.setCursor(this.editor.cursor);
-    // this.state.setTextRow(this.editor.textRow);
-    // this.addSymbol = '';
-    const textareaContent = this.store.textareaContent + symbol;
-    this.store.textareaContent = textareaContent;
+    this.newSymbol = symbol;
+    this.editor.textareaContent = this.store.textareaContent;
+    this.editor.textareaRow = this.store.textareaRow;
+    this.editor.cursor = this.store.cursor;
+    this.executeCommand(new Add(this, this.editor));
+    this.store.textareaContent = this.editor.textareaContent;
+    this.store.textareaRow = this.editor.textareaRow;
+    this.store.cursor = this.editor.cursor;
+    this.newSymbol = '';
+    // const textareaContent = this.store.textareaContent + symbol;
+    // this.store.textareaContent = textareaContent;
 
   };
 
@@ -295,12 +307,150 @@ class Controller {
     this.store.activeBtns = this.activeBtns;
   }
   
+  upCursor = () => {
+    console.log(this.store.cursor)
+    const { line, pos, number } = this.store.cursor;
+    const textareaRow = this.store.textareaRow;
+    if (line !== 0) {
+      const newLine = line - 1;
+      let newNumber = 0;
+      
+      if (newLine > 0) {
+        for (let i = 0; i < newLine; i++) {
+          newNumber += textareaRow[i].length;
+        }
+      }
+      
+      if (textareaRow[newLine].length > pos) {
+        newNumber += pos;
+        this.store.cursor = {
+          number: newNumber,
+          line: newLine,
+          pos,
+        };
+      } else {
+        newNumber += textareaRow[newLine].length - 1;
+        this.store.cursor = {
+          number: newNumber,
+          line: newLine,
+          pos: textareaRow[newLine].length - 1,
+        };
+      }
+
+    }
+    console.log(this.store.cursor)
+    
+  };
+  
+  downCursor = () => {
+    console.log(this.store.cursor);
+    const { line, pos, number } = this.store.cursor;
+    const textareaRow = this.store.textareaRow;
+
+    if (line !== textareaRow.length - 1) {
+      const newLine = line + 1;
+      let newNumber = 0;
+      for (let i = 0; i < newLine; i++) {
+        newNumber += textareaRow[i].length;
+      }
+      if (textareaRow[newLine].length > pos) {
+        newNumber += pos;
+        this.store.cursor = {
+          number: newNumber,
+          line: newLine,
+          pos,
+        };
+      } else {
+        newNumber += textareaRow[newLine].length - 1;
+        let newPos = textareaRow[newLine].length - 1;
+        // if (newLine !== textareaRow.length - 1) {
+        //   // newNumber -= 1;
+        //   // newPos -= 1;
+        // }
+        this.store.cursor = {
+          number: newNumber,
+          line: newLine,
+          pos: newPos,
+        };
+      }
+    }
+    console.log(this.store.cursor);
+
+  };
+  
+  leftCursor = () => {
+    const { line, pos, number } = this.store.cursor;
+    const textareaRow = this.store.textareaRow;
+    if (pos === 0 && line === 0) return;
+    if (pos - 1 === 0) {
+      let newNumber = 0;
+      if (line !== 0) {
+        for (let i = 0; i < line; i++) {
+          newNumber += textareaRow[i].length;
+        }
+      } 
+      this.store.cursor = {
+        number: newNumber,
+        line,
+        pos: 0,
+      };
+    } else if (pos === 0) {
+      let newNumber = 0;
+      const newLine = line - 1;
+      for (let i = 0; i < line; i++) {
+        newNumber += textareaRow[i].length;
+      }
+      this.store.cursor = {
+        number: newNumber - 1,
+        line: newLine,
+        pos: textareaRow[newLine].length - 1,
+      };
+    } else {
+      const newNumber = number - 1;
+      const newPos = pos - 1;
+      this.store.cursor = {
+        number: newNumber,
+        line,
+        pos: newPos,
+      };
+    }
+
+  };
+  
+  rightCursor = () => {
+    const { line, pos, number } = this.store.cursor;
+    const textareaRow = this.store.textareaRow;
+    
+    if (number === this.store.textareaContent.length) return;
+    if (pos + 1 === textareaRow[line].length) {
+      this.store.cursor = {
+        number: number + 1,
+        line: line + 1,
+        pos: 0,
+      };
+    } else {
+      this.store.cursor = {
+        number: number + 1,
+        line,
+        pos: pos + 1,
+      };
+
+    }
+  }
+  
   editMap = {
     'symbol': this.symbol,
     'delete': this.delete,
-    'move': this.move,
+    'move': this.moveCursor,
     'capslock': this.capsLock,
     'space': this.space,
+  }
+  
+  cursorHandler = {
+    'up': this.upCursor,
+    'down': this.downCursor,
+    'left': this.leftCursor,
+    'right': this.rightCursor,
   }
   
   keyHandler = {
@@ -320,6 +470,12 @@ class Controller {
       }
     });
     this.store.keys = keys;
+  };
+  
+  executeCommand(command) {
+    if (command.execute()) {
+      this.history.push(command);
+    }
   }
 
 }

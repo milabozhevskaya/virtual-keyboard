@@ -25,6 +25,7 @@ class View extends Element {
     document.addEventListener('keyup', (event) => this.controller.keyUp(event.code), true);
     this.store.onChangeTextareaContent.add((content) => this.main.onChangeTextareaContent(content));
     this.store.onChangeLang.add((lang) => this.header.onChangeLang(lang));
+    this.store.onChangeCursorPosition.add((position) => this.main.onChangeCursorPosition(position));
     this.store.onInitKeys.add((keys) => this.main.onInitKeys(keys));
   }
   

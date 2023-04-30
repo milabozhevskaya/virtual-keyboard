@@ -5,12 +5,38 @@ class Store {
     this._langIndex = 0;
     this._langMap = ['en', 'ru'];
     this._textareaContent = '';
+    this._textareaRow = [''];
+    this._cursor = { line: 0, pos: 0, number: 0 };
     this._keys = {};
     this._activeBtns = {};
     this._lastControl = { id: null, time: null };
     this._activeControls = {};
     this._lastKey = null;
     this._capsLock = false;
+  }
+  
+  get cursor() {
+    return this._cursor;
+  }
+
+  set cursor(newPosition) {
+    this._cursor = newPosition;
+    this.onChangeCursorPosition.emit({
+      start: this._cursor.number,
+      end: this._cursor.number,
+    });
+  }
+
+  get textareaRow() {
+    return this._textareaRow;
+  }
+
+  set textareaRow(textareaRow) {
+    this._textareaRow = textareaRow;
+  }
+
+  get() {
+    return this;
   }
   
   get textareaContent() {
@@ -94,6 +120,7 @@ class Store {
   
   onChangeTextareaContent = new Signal();
   onChangeLang = new Signal();
+  onChangeCursorPosition = new Signal();
   onInitKeys = new Signal();
 }
 
