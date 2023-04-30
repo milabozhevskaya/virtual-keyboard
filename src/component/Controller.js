@@ -87,7 +87,7 @@ class Controller {
   };
 
   mouseDown = (code, time) => {
-    const lang = this.store.lang;
+    const lang = this.store.lang[this.store.langIndex];
     const key = this.store.getKeyContent(code);
     const { type } = key;
     // this.activeBtns = this.store.activeBtns;
@@ -166,7 +166,7 @@ class Controller {
   
   mouseUp = (code, time) => {
     // console.log(code);
-    const lang = this.store.lang;
+    const lang = this.store.lang[this.store.langIndex];
     const key = this.store.getKeyContent(code);
     const { type } = key;
 
@@ -212,8 +212,8 @@ class Controller {
       if (this.controlCombinations[i].every((l) => (activeControlsKeys.includes(l)))) {
         console.log(activeControlsKeys);
         if (this.controlCombinations[i].join('') === 'ControlShift') {
-          // const lang = this.state.getLang() === 'en' ? 'ru' : 'en';
-          // this.state.setLang(lang);
+          const langIndex = this.store.langIndex;
+          this.store.langIndex = (langIndex + 1) % this.store.lang.length;
           // localStorage.setItem('key_lang', lang);
         }
         if (this.controlCombinations[i].join('') === 'ControlKeyZ') {
@@ -235,7 +235,7 @@ class Controller {
 
   keyDown = (code) => {
     if (this.excludeKey.includes(code)) return;
-    const lang = this.store.lang;
+    const lang = this.store.lang[this.store.langIndex];
     const key = this.store.getKeyContent(code);
     const { type } = key;
 
@@ -275,7 +275,7 @@ class Controller {
   keyUp = (code) => {
     if (this.excludeKey.includes(code)) return;
     
-    const lang = this.store.lang;
+    const lang = this.store.lang[this.store.langIndex];
     const key = this.store.getKeyContent(code);
     const { type } = key;
 

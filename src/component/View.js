@@ -14,6 +14,7 @@ class View extends Element {
         parent: this.node,
         className: 'keyboard',
         lang: 'en',
+        controller,
     });
     this.main = new Main({
         parent: this.node,
@@ -22,9 +23,8 @@ class View extends Element {
     });
     document.addEventListener('keydown', (event) => this.controller.keyDown(event.code), true);
     document.addEventListener('keyup', (event) => this.controller.keyUp(event.code), true);
-    // this.main.node.addEventListener('keydown', (event) => this.controller.keyDown(event.code), true);
-    // this.main.node.addEventListener('keyup', (event) => this.controller.keyUp(event.code), true);
     this.store.onChangeTextareaContent.add((content) => this.main.onChangeTextareaContent(content));
+    this.store.onChangeLang.add((lang) => this.header.onChangeLang(lang));
     this.store.onInitKeys.add((keys) => this.main.onInitKeys(keys));
   }
   

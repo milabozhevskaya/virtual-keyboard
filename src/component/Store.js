@@ -2,7 +2,8 @@ import { Signal } from "./helper/signal";
 
 class Store {
   constructor() {
-    this._lang = 'en';
+    this._langIndex = 0;
+    this._langMap = ['en', 'ru'];
     this._textareaContent = '';
     this._keys = {};
     this._activeBtns = {};
@@ -30,12 +31,21 @@ class Store {
     this.onInitKeys.emit(this._keys);
   }
   
-  get lang() {
-    return this._lang;
+  get langIndex() {
+    return this._langIndex;
   }
   
-  set lang(lang) {
-    this._lang = lang;
+  set langIndex(langIndex) {
+    this._langIndex = langIndex;
+    this.onChangeLang.emit(this._langMap[this._langIndex]);
+  }
+  
+  get lang() {
+    return this._langMap;
+  }
+  
+  set lang(langMap) {
+    this._langMap = langMap;
   }
   
   getKeyContent(code) {
@@ -83,6 +93,7 @@ class Store {
   }
   
   onChangeTextareaContent = new Signal();
+  onChangeLang = new Signal();
   onInitKeys = new Signal();
 }
 
