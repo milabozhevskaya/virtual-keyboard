@@ -1,16 +1,16 @@
-import { Key } from "./Key";
+import { Key } from './Key';
 
 class KeyAlt extends Key {
   constructor({
-    parent, 
-    className, 
+    parent,
+    className,
     code,
     content,
     controller,
   }) {
-    super({ 
-      parent, 
-      className, 
+    super({
+      parent,
+      className,
       code,
       content,
       controller,

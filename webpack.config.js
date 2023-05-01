@@ -49,9 +49,10 @@ const config = {
                         loader: 'css-loader',
                         options: {
                             importLoaders: 1,
-                            modules: {
-                                exportLocalsConvention: "camelCase",
-                            },
+                            modules: true,
+                            // modules: {
+                            //     exportLocalsConvention: "camelCase",
+                            // },
                             sourceMap: true,
                         },
                     },

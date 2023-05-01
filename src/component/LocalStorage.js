@@ -1,5 +1,10 @@
 class LocalStorageData {
-  constructor({ lang = 'en', textareaContent = '', textareaRow = [''], cursor = { number: 0, line: 0, pos:0} }) {
+  constructor({
+    lang = 'en',
+    textareaContent = '',
+    textareaRow = [''],
+    cursor = { number: 0, line: 0, pos: 0 },
+  }) {
     this.lang = lang;
     this.textareaContent = textareaContent;
     this.textareaRow = textareaRow;
@@ -14,9 +19,7 @@ class LocalStorageData {
     return key in object;
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   static fromJson(data) {
-    
     const initData = {};
 
     if (data === null || typeof data !== 'object') {

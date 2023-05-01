@@ -1,17 +1,18 @@
-import { Editor } from "./Editor";
+import { Editor } from './Editor';
 import { Add } from './command/Add';
 import { Delete } from './command/Delete';
-import { History } from "./EditHistory";
-import { Copy } from "./command/Copy";
-import { Replace } from "./command/Replace";
-import { Cut } from "./command/Cut";
-import { Paste } from "./command/Paste";
-import { LocalStorageData } from "./LocalStorage";
+import { History } from './EditHistory';
+import { Copy } from './command/Copy';
+import { Replace } from './command/Replace';
+import { Cut } from './command/Cut';
+import { Paste } from './command/Paste';
+import { LocalStorageData } from './LocalStorage';
 
 class Controller {
   constructor(store) {
     this.store = store;
     this.editor = new Editor();
+
     this.history = new History({
       backupTextareaContent: '',
       backupCursor: { line: 0, pos: 0, number: 0 },
@@ -24,9 +25,8 @@ class Controller {
     this.lastKey = null;
     this.newSymbol = null;
     this.selectedTextRange = null;
-    
-    this.store.onChangeLocalStorageData.add((data) => this.toLocalStorageData(data));
 
+    this.store.onChangeLocalStorageData.add((data) => this.toLocalStorageData(data));
   }
 
   controlCombinations = [
@@ -51,21 +51,24 @@ class Controller {
   ];
 
   excludeKey = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'];
-  
+
   toLocalStorageData = (dataFromLocalSorage) => {
     localStorage.setItem('virtual_keyboard_by_Mi', LocalStorageData.toJson(dataFromLocalSorage));
-  }
+  };
 
-  
   getLocalStorageData = () => {
     try {
       const data = LocalStorageData.fromJson(JSON.parse(localStorage.getItem('virtual_keyboard_by_Mi') || ''));
       return data;
     } catch (e) {
-      return new LocalStorageData({ lang: 'en', textareaContent: '', textareaRow: [''], cursor: { number: 0, line: 0, pos: 0 }});
+      return new LocalStorageData({
+        lang: 'en',
+        textareaContent: '',
+        textareaRow: [''],
+        cursor: { number: 0, line: 0, pos: 0 },
+      });
     }
-  }
-
+  };
 
   hasActiveShift = () => {
     const activeKeys = Object.keys(this.activeControls)
@@ -77,15 +80,15 @@ class Controller {
     let symbol = '';
     if (code.includes('Key')) {
       symbol = (
-        (this.hasActiveShift() && !this.store.capsLock) || (!this.hasActiveShift() && this.store.capsLock)
+        (this.hasActiveShift() && !this.store.capsLock)
+        || (!this.hasActiveShift() && this.store.capsLock)
       ) ? shiftValue : value;
-    }
-    else symbol = this.hasActiveShift() ? shiftValue : value;
+    } else symbol = this.hasActiveShift() ? shiftValue : value;
 
     this.add(symbol);
   };
 
-  delete = (code, { value }) => {
+  delete = (code) => {
     this.deleteDirection = code === 'Backspace' ? 'prev' : 'next';
     this.editor.textareaContent = this.store.textareaContent;
     this.editor.textareaRow = this.store.textareaRow;
@@ -101,7 +104,7 @@ class Controller {
     this.add(value);
   };
 
-  capsLock = (code, { value }) => {
+  capsLock = () => {
     const caps = this.store.capsLock;
     this.store.capsLock = !caps;
   };
@@ -109,33 +112,31 @@ class Controller {
   moveCursor = (code) => {
     const direction = code.slice(5).toLowerCase();
     if (this.isSelectedText) {
-      
       const start = Math.min(this.selectedTextRange.start, this.selectedTextRange.end);
       const end = Math.max(this.selectedTextRange.start, this.selectedTextRange.end);
-      
+
       this.editor.textareaContent = this.store.textareaContent;
       this.editor.textareaRow = this.store.textareaRow;
       this.editor.cursor = this.store.cursor;
       this.editor.setCursorPosition(
         (direction === 'left' || direction === 'up')
-          ? start : end
+          ? start : end,
       );
       this.store.cursor = this.editor.cursor;
       this.isSelectedText = false;
       this.isCopiedText = false;
       this.selectedTextRange = null;
-      if (direction === 'left' || direction === 'right') return true;;
+      if (direction === 'left' || direction === 'right') return true;
     }
 
     this.cursorHandler[direction]();
     return true;
-  }
+  };
 
   add = (symbol) => {
     this.newSymbol = symbol;
 
     if (this.isSelectedText) {
-      
       this.editor.textareaContent = this.store.textareaContent;
       this.editor.textareaRow = this.store.textareaRow;
       this.editor.cursor = this.store.cursor;
@@ -160,7 +161,6 @@ class Controller {
     this.newSymbol = '';
     // const textareaContent = this.store.textareaContent + symbol;
     // this.store.textareaContent = textareaContent;
-
   };
 
   mouseDown = (code, time) => {
@@ -175,7 +175,7 @@ class Controller {
     if (type === 'control') {
       if ((this.lastControl.id && this.lastControl.id === code)
         && (this.lastControl.time && ((time - this.lastControl.time) < 300))) {
-        // если последняя контольная есть и совпадает с пришедшей 
+        // если последняя контольная есть и совпадает с пришедшей
         // и отличие во времени меньше 300 мсек
         // то добавляем в активные контролы
         this.activeControls[code] = 1;
@@ -184,33 +184,29 @@ class Controller {
         this.activeBtns[code] = 1;
         // также заменяем последнюю кнопку на пришедшую
         this.lastKey = code;
+      } else if (!this.hasControls()) {
+        // если контрольных точек до этого еще не выбрано
+        // то просто записывает в последнюю контрльную
+        this.lastControl = { id: code, time };
+        this.activeBtns[code] = 1;
+        this.lastKey = code;
+      } else if (this.activeControls[code]) {
+        this.activeControls[code] = 0;
+        this.activeBtns[code] = 1;
+        this.lastKey = code;
+        this.lastControl = { id: null, time: null };
+      } else if (!this.hasControlCombination(code)) {
+        this.activeControls[code] = 0;
+        this.activeBtns[code] = 1;
+        this.lastKey = code;
+        this.lastControl = { id: code, time };
+        // здесь надо еще проверка на колво акт.контролов
+        // чтоб не превышала цепочка в 4 контрола, иначе сброс
       } else {
-        if (!this.hasControls()) {
-          // если контрольных точек до этого еще не выбрано
-          // то просто записывает в последнюю контрльную
-          this.lastControl = { id: code, time };
-          this.activeBtns[code] = 1;
-          this.lastKey = code;
-        } else {
-          if (this.activeControls[code]) {
-            this.activeControls[code] = 0;
-            this.activeBtns[code] = 1;
-            this.lastKey = code;
-            this.lastControl = { id: null, time: null };
-          } else if (!this.hasControlCombination(code)) {
-            this.activeControls[code] = 0;
-            this.activeBtns[code] = 1;
-            this.lastKey = code;
-            this.lastControl = { id: code, time };
-            // здесь надо еще проверка на колво акт.контролов
-            // чтоб не превышала цепочка в 4 контрола, иначе сброс
-          } else {
-            this.resetControls();
-            this.lastControl = { id: null, time: null };
-            this.activeBtns[code] = 1;
-            this.lastKey = code;
-          }
-        }
+        this.resetControls();
+        this.lastControl = { id: null, time: null };
+        this.activeBtns[code] = 1;
+        this.lastKey = code;
       }
     } else if (this.hasControls()) {
       if (this.hasControlCombination(code)) {
@@ -219,10 +215,6 @@ class Controller {
         this.lastKey = code;
         this.activeBtns[code] = 1;
       } else {
-        // if (type === 'capsLock') this.state.changeCapsLock();
-        // else if (type === 'move') this.moveCursor(code);
-        // else if (type === 'delete') this.delete(code);
-        // else 
         if (type === 'meta' || !this.editMap[type]);
         else this.editMap[type](code, key[lang]);
         this.resetControls();
@@ -239,11 +231,9 @@ class Controller {
       else this.editMap[type](code, key[lang]);
     }
     this.store.activeBtns = this.activeBtns;
-  }
+  };
 
-  mouseUp = (code, time) => {
-    // console.log(code);
-    const lang = this.store.lang[this.store.langIndex];
+  mouseUp = (code) => {
     const key = this.store.getKeyContent(code);
     const { type } = key;
 
@@ -270,12 +260,12 @@ class Controller {
       }
     }
     this.store.activeBtns = this.activeBtns;
-    
+
     if (!(type === 'control' || type === 'capslock' || type === 'meta') && this.isSelectedText && !this.isCopiedText) {
       // this.selectedTextRange = null;
       this.isSelectedText = false;
     }
-  }
+  };
 
   resetControls = () => { this.activeControls = {}; };
 
@@ -293,9 +283,8 @@ class Controller {
     for (let i = 0; i < this.controlCombinations.length; i += 1) {
       if (this.controlCombinations[i].every((l) => (activeControlsKeys.includes(l)))) {
         if (this.controlCombinations[i].join('') === 'ControlShift') {
-          const langIndex = this.store.langIndex;
+          const langIndex = { ...this.store.langIndex };
           this.store.langIndex = (langIndex + 1) % this.store.lang.length;
-          // localStorage.setItem('key_lang', lang);
         }
         if (this.controlCombinations[i].join('') === 'ControlKeyZ') {
           if (this.isSelectedText) {
@@ -303,7 +292,7 @@ class Controller {
             this.isCopiedText = false;
             this.selectedTextRange = null;
           }
-      
+
           const backCommand = this.history.back();
           if (backCommand) {
             this.store.textareaContent = backCommand.backupTextareaContent;
@@ -332,7 +321,7 @@ class Controller {
           this.store.textareaContent = this.editor.textareaContent;
           this.store.textareaRow = this.editor.textareaRow;
           this.store.cursor = this.editor.cursor;
-      
+
           this.isSelectedText = false;
           this.isCopiedText = false;
           this.selectedTextRange = null;
@@ -342,9 +331,8 @@ class Controller {
           this.editor.textareaContent = this.store.textareaContent;
           this.editor.textareaRow = this.store.textareaRow;
           this.editor.cursor = this.store.cursor;
-          
+
           if (this.isSelectedText) {
-            
             this.executeCommand(new Replace(this, this.editor));
             this.store.textareaContent = this.editor.textareaContent;
             this.store.textareaRow = this.editor.textareaRow;
@@ -352,14 +340,14 @@ class Controller {
             this.isSelectedText = false;
             this.isCopiedText = false;
             this.selectedTextRange = null;
-            return;
+            return true;
           }
-      
+
           this.executeCommand(new Paste(this, this.editor));
           this.store.textareaContent = this.editor.textareaContent;
           this.store.textareaRow = this.editor.textareaRow;
           this.store.cursor = this.editor.cursor;
-      
+
           this.isSelectedText = false;
           this.isCopiedText = false;
           this.selectedTextRange = null;
@@ -370,10 +358,10 @@ class Controller {
           this.executeCommand(new Copy(this, this.editor));
           this.isCopiedText = true;
         }
-        return this.controlCombinations[i];
+        return true;
       }
     }
-    return null;
+    return false;
   }
 
   hasControls = () => Object.keys(this.activeControls)
@@ -427,8 +415,7 @@ class Controller {
             this.isSelectedText = false;
             this.isCopiedText = false;
           }
-        }
-        else this.editMap[type](code, key[lang]);
+        } else this.editMap[type](code, key[lang]);
         this.activeBtns[code] = 1;
       }
     } else {
@@ -443,17 +430,14 @@ class Controller {
           this.isSelectedText = false;
           this.isCopiedText = false;
         }
-      }
-      else this.editMap[type](code, key[lang]);
+      } else this.editMap[type](code, key[lang]);
     }
     this.store.activeBtns = this.activeBtns;
-  }
-
+  };
 
   keyUp = (code) => {
     if (this.excludeKey.includes(code)) return;
 
-    const lang = this.store.lang[this.store.langIndex];
     const key = this.store.getKeyContent(code);
     if (!key) {
       if (this.isSelectedText) {
@@ -484,22 +468,22 @@ class Controller {
       }
     }
     this.store.activeBtns = this.activeBtns;
-    
+
     if (!(type === 'control' || type === 'capslock' || type === 'meta') && this.isSelectedText && !this.isCopiedText) {
       // this.selectedTextRange = null;
       this.isSelectedText = false;
     }
-  }
+  };
 
   upCursor = () => {
-    const { line, pos, number } = this.store.cursor;
-    const textareaRow = this.store.textareaRow;
+    const { line, pos } = this.store.cursor;
+    const textareaRow = { ...this.store.textareaRow };
     if (line !== 0) {
       const newLine = line - 1;
       let newNumber = 0;
 
       if (newLine > 0) {
-        for (let i = 0; i < newLine; i++) {
+        for (let i = 0; i < newLine; i += 1) {
           newNumber += textareaRow[i].length;
         }
       }
@@ -519,19 +503,17 @@ class Controller {
           pos: textareaRow[newLine].length - 1,
         };
       }
-
     }
-
   };
 
   downCursor = () => {
-    const { line, pos, number } = this.store.cursor;
-    const textareaRow = this.store.textareaRow;
+    const { line, pos } = this.store.cursor;
+    const textareaRow = { ...this.store.textareaRow };
 
     if (line !== textareaRow.length - 1) {
       const newLine = line + 1;
       let newNumber = 0;
-      for (let i = 0; i < newLine; i++) {
+      for (let i = 0; i < newLine; i += 1) {
         newNumber += textareaRow[i].length;
       }
       if (textareaRow[newLine].length > pos) {
@@ -543,7 +525,7 @@ class Controller {
         };
       } else {
         newNumber += textareaRow[newLine].length - 1;
-        let newPos = textareaRow[newLine].length - 1;
+        const newPos = textareaRow[newLine].length - 1;
         // if (newLine !== textareaRow.length - 1) {
         //   // newNumber -= 1;
         //   // newPos -= 1;
@@ -555,17 +537,16 @@ class Controller {
         };
       }
     }
-
   };
 
   leftCursor = () => {
     const { line, pos, number } = this.store.cursor;
-    const textareaRow = this.store.textareaRow;
+    const textareaRow = { ...this.store.textareaRow };
     if (pos === 0 && line === 0) return;
     if (pos - 1 === 0) {
       let newNumber = 0;
       if (line !== 0) {
-        for (let i = 0; i < line; i++) {
+        for (let i = 0; i < line; i += 1) {
           newNumber += textareaRow[i].length;
         }
       }
@@ -577,7 +558,7 @@ class Controller {
     } else if (pos === 0) {
       let newNumber = 0;
       const newLine = line - 1;
-      for (let i = 0; i < line; i++) {
+      for (let i = 0; i < line; i += 1) {
         newNumber += textareaRow[i].length;
       }
       this.store.cursor = {
@@ -594,12 +575,11 @@ class Controller {
         pos: newPos,
       };
     }
-
   };
 
   rightCursor = () => {
     const { line, pos, number } = this.store.cursor;
-    const textareaRow = this.store.textareaRow;
+    const textareaRow = { ...this.store.textareaRow };
 
     if (number === this.store.textareaContent.length) return;
     if (pos + 1 === textareaRow[line].length) {
@@ -614,48 +594,47 @@ class Controller {
         line,
         pos: pos + 1,
       };
-
     }
   };
-  
+
   setCursorFromTextarea = (number) => {
     this.editor.textareaContent = this.store.textareaContent;
     this.editor.textareaRow = this.store.textareaRow;
     this.editor.cursor = this.store.cursor;
-    this.editor.setCursorPosition(number)
+    this.editor.setCursorPosition(number);
     this.store.cursor = this.editor.cursor;
     if (this.isSelectedText) {
       this.selectedTextRange = null;
       this.isSelectedText = false;
-      this.isCopiedText = false; 
+      this.isCopiedText = false;
     }
   };
-  
+
   selectTextRange = (start, end) => {
     if (this.selectedTextRange) this.selectedTextRange = null;
-    this.selectedTextRange =  { start, end };
+    this.selectedTextRange = { start, end };
     this.isSelectedText = true;
-  }
+  };
 
   editMap = {
-    'symbol': this.symbol,
-    'delete': this.delete,
-    'move': this.moveCursor,
-    'capslock': this.capsLock,
-    'space': this.space,
+    symbol: this.symbol,
+    delete: this.delete,
+    move: this.moveCursor,
+    capslock: this.capsLock,
+    space: this.space,
   };
-  
+
   textareaHandler = {
-    setCursorPosition:  this.setCursorFromTextarea,
+    setCursorPosition: this.setCursorFromTextarea,
     selectTextRange: this.selectTextRange,
-  }
+  };
 
   cursorHandler = {
-    'up': this.upCursor,
-    'down': this.downCursor,
-    'left': this.leftCursor,
-    'right': this.rightCursor,
-  }
+    up: this.upCursor,
+    down: this.downCursor,
+    left: this.leftCursor,
+    right: this.rightCursor,
+  };
 
   keyHandler = {
     mouseDown: this.mouseDown,
@@ -671,9 +650,12 @@ class Controller {
     data.forEach((key) => {
       keys[`${key.code}`] = {
         ...key,
-      }
+      };
     });
-    this.store.setInitState({ keys, langIndex: this.store.lang.indexOf(this.localStorageData.lang) });
+    this.store.setInitState({
+      keys,
+      langIndex: this.store.lang.indexOf(this.localStorageData.lang),
+    });
   };
 
   executeCommand(command) {
@@ -681,7 +663,6 @@ class Controller {
       this.history.save(command);
     }
   }
-
 }
 
 export { Controller };

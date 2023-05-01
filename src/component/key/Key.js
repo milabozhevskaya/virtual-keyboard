@@ -1,17 +1,17 @@
-import { Element } from '../helper/element.js';
+import { Element } from '../helper/element';
 
 class Key extends Element {
-  constructor({ 
-    parent, 
-    className, 
+  constructor({
+    parent,
+    className,
     code,
     content,
     controller,
-   }) {
-    super({ 
-        parent,
-        tagName: 'button',
-        className: `${className}__btn btn ${code}` ,
+  }) {
+    super({
+      parent,
+      tagName: 'button',
+      className: `${className}__btn btn ${code}`,
     });
     this.code = code;
     this.content = content;
@@ -31,23 +31,19 @@ class Key extends Element {
     this.node.onmousedown = (event) => {
       event.preventDefault();
       this.controller.mouseDown(this.code, event.timeStamp);
-      this.node.onmouseover = (event) => this.node.onmouseup(event);
+      this.node.onmouseover = (e) => this.node.onmouseup(e);
     };
-    // this.node.onmousedown = (event) => { onClick('mouseDown', event.timeStamp); this.node.onmouseover = () => this.node.onmouseup(); };
     this.node.onmouseup = (event) => {
       this.controller.mouseUp(this.code, event.timeStamp);
       this.node.onmouseover = null;
     };
-
   }
-  
+
   update = (content) => {
     if (this.content !== content) this.content = content;
-    this.mainContent.node.textContent = this.content[0];
+    [this.mainContent.node.textContent] = this.content;
     this.beforeContent.node.textContent = `${this.content.length === 2 ? this.content[1] : ''}`;
   };
-  
-  
 }
 
 export { Key };

@@ -1,9 +1,12 @@
-import { Command } from './Command.js';
+import { Command } from './Command';
 
 class Copy extends Command {
   constructor(controller, editor) {
     super(controller, editor, () => {
-      editor.saveSelect(controller.selectedTextRange.start, controller.selectedTextRange.end);
+      editor.saveSelect(
+        controller.selectedTextRange.start,
+        controller.selectedTextRange.end,
+      );
       return false;
     });
   }

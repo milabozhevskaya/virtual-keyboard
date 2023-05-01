@@ -1,16 +1,16 @@
-import { Key } from "./Key";
+import { Key } from './Key';
 
 class KeyShift extends Key {
-  constructor({       
-    parent, 
-    className, 
+  constructor({
+    parent,
+    className,
     code,
     content,
     controller,
-}) {
-    super({ 
-      parent, 
-      className, 
+  }) {
+    super({
+      parent,
+      className,
       code,
       content,
       controller,
