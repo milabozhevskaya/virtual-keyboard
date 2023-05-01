@@ -62,7 +62,7 @@ class Controller {
       const data = LocalStorageData.fromJson(JSON.parse(localStorage.getItem('virtual_keyboard_by_Mi') || ''));
       return data;
     } catch (e) {
-      return new LocalStorageData();
+      return new LocalStorageData({ lang: 'en', textareaContent: '', textareaRow: [''], cursor: { number: 0, line: 0, pos: 0 }});
     }
   }
 
