@@ -84,6 +84,7 @@ class Controller {
         || (!this.hasActiveShift() && this.store.capsLock)
       ) ? shiftValue : value;
     } else symbol = this.hasActiveShift() ? shiftValue : value;
+    this.resetControls();
 
     this.add(symbol);
   };
@@ -234,9 +235,6 @@ class Controller {
   };
 
   mouseUp = (code) => {
-    const key = this.store.getKeyContent(code);
-    const { type } = key;
-
     this.activeBtns = this.store.activeBtns;
     if (this.lastKey === code) {
       if (this.hasControls()) {
@@ -260,11 +258,6 @@ class Controller {
       }
     }
     this.store.activeBtns = this.activeBtns;
-
-    if (!(type === 'control' || type === 'capslock' || type === 'meta') && this.isSelectedText && !this.isCopiedText) {
-      // this.selectedTextRange = null;
-      this.isSelectedText = false;
-    }
   };
 
   resetControls = () => { this.activeControls = {}; };
@@ -283,8 +276,7 @@ class Controller {
     for (let i = 0; i < this.controlCombinations.length; i += 1) {
       if (this.controlCombinations[i].every((l) => (activeControlsKeys.includes(l)))) {
         if (this.controlCombinations[i].join('') === 'ControlShift') {
-          const langIndex = { ...this.store.langIndex };
-          this.store.langIndex = (langIndex + 1) % this.store.lang.length;
+          this.store.langIndex = (this.store.langIndex + 1) % this.store.lang.length;
         }
         if (this.controlCombinations[i].join('') === 'ControlKeyZ') {
           if (this.isSelectedText) {
@@ -328,6 +320,7 @@ class Controller {
         }
         if (this.controlCombinations[i].join('') === 'ControlKeyV') {
           this.newSymbol = this.editor.buffer.getLast();
+          if (this.newSymbol === '') return true;
           this.editor.textareaContent = this.store.textareaContent;
           this.editor.textareaRow = this.store.textareaRow;
           this.editor.cursor = this.store.cursor;
@@ -452,8 +445,6 @@ class Controller {
       return;
     }
 
-    const { type } = key;
-
     this.activeBtns = this.store.activeBtns;
     if (this.hasControls()) {
       this.activeBtns[code] = 0;
@@ -469,15 +460,16 @@ class Controller {
     }
     this.store.activeBtns = this.activeBtns;
 
-    if (!(type === 'control' || type === 'capslock' || type === 'meta') && this.isSelectedText && !this.isCopiedText) {
-      // this.selectedTextRange = null;
-      this.isSelectedText = false;
-    }
+    // if (!(type === 'control' || type === 'capslock' || type === 'meta')
+    // && this.isSelectedText && !this.isCopiedText) {
+    //   // this.selectedTextRange = null;
+    //   this.isSelectedText = false;
+    // }
   };
 
   upCursor = () => {
     const { line, pos } = this.store.cursor;
-    const textareaRow = { ...this.store.textareaRow };
+    const textareaRow = [...this.store.textareaRow];
     if (line !== 0) {
       const newLine = line - 1;
       let newNumber = 0;
@@ -508,7 +500,7 @@ class Controller {
 
   downCursor = () => {
     const { line, pos } = this.store.cursor;
-    const textareaRow = { ...this.store.textareaRow };
+    const textareaRow = [...this.store.textareaRow];
 
     if (line !== textareaRow.length - 1) {
       const newLine = line + 1;
@@ -541,7 +533,7 @@ class Controller {
 
   leftCursor = () => {
     const { line, pos, number } = this.store.cursor;
-    const textareaRow = { ...this.store.textareaRow };
+    const textareaRow = [...this.store.textareaRow];
     if (pos === 0 && line === 0) return;
     if (pos - 1 === 0) {
       let newNumber = 0;
@@ -663,6 +655,15 @@ class Controller {
       this.history.save(command);
     }
   }
+
+  setActiveKey = () => {
+    Object.keys(this.activeBtns).forEach((btn) => {
+      if (this.activeBtns[btn] === 0) {
+        delete this.activeBtns[btn];
+      }
+    });
+    this.store.activeBtns = this.activeBtns;
+  };
 }
 
 export { Controller };

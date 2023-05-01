@@ -39,6 +39,8 @@ class Main extends Element {
     this.board.init(keys);
   };
 
+  onChangeActiveBtns = (activeBtnsMap) => this.board.onChangeActiveBtns(activeBtnsMap);
+
   onChangeLang = (lang) => {
     this.board.onChangeLang(lang);
   };

@@ -30,7 +30,12 @@ class View extends Element {
       this.header.onChangeLang(lang);
       this.main.onChangeLang(lang);
     });
-    this.store.onChangeCursorPosition.add((position) => this.main.onChangeCursorPosition(position));
+    this.store.onChangeActiveBtns.add(
+      (activeBtnsMap) => this.main.onChangeActiveBtns(activeBtnsMap),
+    );
+    this.store.onChangeCursorPosition.add(
+      (position) => this.main.onChangeCursorPosition(position),
+    );
     this.store.onInitState.add(({ keys, lang }) => {
       this.header.onChangeLang(lang);
       this.main.onInitState({ keys, lang });

@@ -43,6 +43,15 @@ class Board extends Element {
     }
   }
 
+  onChangeActiveBtns = (activeBtnsMap) => {
+    Object.keys(this.btns).forEach((code) => {
+      if (this.btns[code].node.classList.contains('active')) this.btns[code].node.classList.remove('active');
+    });
+    Object.keys(activeBtnsMap).forEach((code) => {
+      if (activeBtnsMap[code]) this.btns[code].node.classList.add('active');
+    });
+  };
+
   onChangeLang = (lang) => {
     this.lang = lang;
     Object.keys(this.btns).forEach((code) => {

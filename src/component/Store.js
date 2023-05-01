@@ -116,6 +116,7 @@ class Store {
 
   set activeBtns(btnsMap) {
     this._activeBtns = btnsMap;
+    this.onChangeActiveBtns.emit(btnsMap);
   }
 
   get lastControl() {
@@ -149,6 +150,8 @@ class Store {
   set capsLock(flag) {
     this._capsLock = flag;
   }
+
+  onChangeActiveBtns = new Signal();
 
   onChangeLocalStorageData = new Signal();
 
