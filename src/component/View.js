@@ -27,7 +27,6 @@ class View extends Element {
     
     this.store.onChangeTextareaContent.add((content) => this.main.onChangeTextareaContent(content));
     this.store.onChangeLang.add((lang) => {
-      console.log(lang)
       this.header.onChangeLang(lang);
       this.main.onChangeLang(lang);
     });

@@ -4,7 +4,7 @@ class Buffer {
   }
   
   getLast = () => {
-    return this.buffer[this.buffer.length - 1];
+    return this.buffer[this.buffer.length - 1] || '';
   };
   
   push = (string) => {

@@ -17,7 +17,6 @@ class Store {
   }
   
   setInitState({ keys, langIndex }) {
-    console.log(this._langMap[langIndex])
     this._langIndex = langIndex;
     this._keys = keys;
     this.onInitState.emit({
@@ -92,7 +91,6 @@ class Store {
   
   set langIndex(langIndex) {
     this._langIndex = langIndex;
-    console.log(langIndex)
     this.onChangeLang.emit(this._langMap[this._langIndex]);
     this.onChangeLocalStorageData.emit({
       lang: this._langMap[this.langIndex],
@@ -111,7 +109,7 @@ class Store {
   }
   
   getKeyContent(code) {
-    return this._keys[code];
+    return this._keys[code] || false;
   }
   
   get activeBtns() {

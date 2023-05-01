@@ -18,7 +18,6 @@ class Controller {
       backupTextareaRow: [''],
     });
     this.localStorageData = this.getLocalStorageData();
-    console.log(this.localStorageData)
     this.activeBtns = {};
     this.lastControl = { id: null, time: null };
     this.activeControls = {};
@@ -54,7 +53,6 @@ class Controller {
   excludeKey = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'];
   
   toLocalStorageData = (dataFromLocalSorage) => {
-console.log(dataFromLocalSorage)
     localStorage.setItem('virtual_keyboard_by_Mi', LocalStorageData.toJson(dataFromLocalSorage));
   }
 
@@ -385,6 +383,18 @@ console.log(dataFromLocalSorage)
     if (this.excludeKey.includes(code)) return;
     const lang = this.store.lang[this.store.langIndex];
     const key = this.store.getKeyContent(code);
+    if (!key) {
+      if (this.isSelectedText) {
+        this.isSelectedText = false;
+        this.isCopiedText = false;
+        this.setCursorFromTextarea(this.selectedTextRange.end);
+        this.store.cursor = this.editor.cursor;
+        this.selectedTextRange = null;
+        this.isSelectedText = false;
+        this.isCopiedText = false;
+      }
+      return;
+    }
     const { type } = key;
 
     this.activeBtns = this.store.activeBtns;
@@ -407,15 +417,18 @@ console.log(dataFromLocalSorage)
       if (this.hasControlCombination(code)) {
         this.activeBtns[code] = 1;
       } else {
-        if (this.isSelectedText) {
-          this.isSelectedText = false;
-          this.isCopiedText = false;
-          this.setCursorFromTextarea(this.selectedTextRange.end);
-          this.store.cursor = this.editor.cursor;
-          this.selectedTextRange = null;
-          this.isSelectedText = false;
-          this.isCopiedText = false;
+        if (type === 'meta' || !this.editMap[type]) {
+          if (this.isSelectedText) {
+            this.isSelectedText = false;
+            this.isCopiedText = false;
+            this.setCursorFromTextarea(this.selectedTextRange.end);
+            this.store.cursor = this.editor.cursor;
+            this.selectedTextRange = null;
+            this.isSelectedText = false;
+            this.isCopiedText = false;
+          }
         }
+        else this.editMap[type](code, key[lang]);
         this.activeBtns[code] = 1;
       }
     } else {
@@ -442,6 +455,19 @@ console.log(dataFromLocalSorage)
 
     const lang = this.store.lang[this.store.langIndex];
     const key = this.store.getKeyContent(code);
+    if (!key) {
+      if (this.isSelectedText) {
+        this.isSelectedText = false;
+        this.isCopiedText = false;
+        this.setCursorFromTextarea(this.selectedTextRange.end);
+        this.store.cursor = this.editor.cursor;
+        this.selectedTextRange = null;
+        this.isSelectedText = false;
+        this.isCopiedText = false;
+      }
+      return;
+    }
+
     const { type } = key;
 
     this.activeBtns = this.store.activeBtns;
