@@ -6,6 +6,7 @@ import { Copy } from "./command/Copy";
 import { Replace } from "./command/Replace";
 import { Cut } from "./command/Cut";
 import { Paste } from "./command/Paste";
+import { LocalStorageData } from "./LocalStorage";
 
 class Controller {
   constructor(store) {
@@ -16,12 +17,17 @@ class Controller {
       backupCursor: { line: 0, pos: 0, number: 0 },
       backupTextareaRow: [''],
     });
+    this.localStorageData = this.getLocalStorageData();
+    console.log(this.localStorageData)
     this.activeBtns = {};
     this.lastControl = { id: null, time: null };
     this.activeControls = {};
     this.lastKey = null;
     this.newSymbol = null;
     this.selectedTextRange = null;
+    
+    this.store.onChangeLocalStorageData.add((data) => this.toLocalStorageData(data));
+
   }
 
   controlCombinations = [
@@ -45,7 +51,23 @@ class Controller {
     ['Control', 'Shift'],
   ];
 
-  excludeKey = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12']
+  excludeKey = ['F1', 'F2', 'F3', 'F4', 'F5', 'F6', 'F7', 'F8', 'F9', 'F10', 'F11', 'F12'];
+  
+  toLocalStorageData = (dataFromLocalSorage) => {
+console.log(dataFromLocalSorage)
+    localStorage.setItem('virtual_keyboard_by_Mi', LocalStorageData.toJson(dataFromLocalSorage));
+  }
+
+  
+  getLocalStorageData = () => {
+    try {
+      const data = LocalStorageData.fromJson(JSON.parse(localStorage.getItem('virtual_keyboard_by_Mi') || ''));
+      return data;
+    } catch (e) {
+      return new LocalStorageData();
+    }
+  }
+
 
   hasActiveShift = () => {
     const activeKeys = Object.keys(this.activeControls)
@@ -394,8 +416,6 @@ class Controller {
           this.isSelectedText = false;
           this.isCopiedText = false;
         }
-        // if (type === 'meta' || !this.editMap[type]);
-        // else this.editMap[type](code, key[lang]);
         this.activeBtns[code] = 1;
       }
     } else {
@@ -627,7 +647,7 @@ class Controller {
         ...key,
       }
     });
-    this.store.keys = keys;
+    this.store.setInitState({ keys, langIndex: this.store.lang.indexOf(this.localStorageData.lang) });
   };
 
   executeCommand(command) {

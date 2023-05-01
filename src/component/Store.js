@@ -13,6 +13,17 @@ class Store {
     this._activeControls = {};
     this._lastKey = null;
     this._capsLock = false;
+    
+  }
+  
+  setInitState({ keys, langIndex }) {
+    console.log(this._langMap[langIndex])
+    this._langIndex = langIndex;
+    this._keys = keys;
+    this.onInitState.emit({
+      keys,
+      lang: this._langMap[langIndex],
+    });
   }
   
   get cursor() {
@@ -25,6 +36,12 @@ class Store {
       start: this._cursor.number,
       end: this._cursor.number,
     });
+    // this.onChangeLocalStorageData.emit({
+    //   lang: this.langMap[this.langIndex],
+    //   textareaContent: this.textareaContent,
+    //   textareaRow: this.textareaRow,
+    //   cursor: this.cursor,
+    // });
   }
 
   get textareaRow() {
@@ -33,6 +50,12 @@ class Store {
 
   set textareaRow(textareaRow) {
     this._textareaRow = textareaRow;
+    // this.onChangeLocalStorageData.emit({
+    //   lang: this.langMap[this.langIndex],
+    //   textareaContent: this.textareaContent,
+    //   textareaRow: this.textareaRow,
+    //   cursor: this.cursor,
+    // });
   }
 
   get() {
@@ -46,6 +69,13 @@ class Store {
   set textareaContent(content) {
     this._textareaContent = content;
     this.onChangeTextareaContent.emit(this._textareaContent);
+    // this.onChangeLocalStorageData.emit({
+    //   lang: this.langMap[this.langIndex],
+    //   textareaContent: this.textareaContent,
+    //   textareaRow: this.textareaRow,
+    //   cursor: this.cursor,
+    // });
+
   }
   
   get keys() {
@@ -54,7 +84,6 @@ class Store {
   
   set keys(keysMap) {
     this._keys = keysMap;
-    this.onInitKeys.emit(this._keys);
   }
   
   get langIndex() {
@@ -63,7 +92,14 @@ class Store {
   
   set langIndex(langIndex) {
     this._langIndex = langIndex;
+    console.log(langIndex)
     this.onChangeLang.emit(this._langMap[this._langIndex]);
+    this.onChangeLocalStorageData.emit({
+      lang: this._langMap[this.langIndex],
+      textareaContent: this.textareaContent,
+      textareaRow: this.textareaRow,
+      cursor: this.cursor,
+    });
   }
   
   get lang() {
@@ -118,10 +154,11 @@ class Store {
     this._capsLock = flag;
   }
   
+  onChangeLocalStorageData = new Signal();
   onChangeTextareaContent = new Signal();
   onChangeLang = new Signal();
   onChangeCursorPosition = new Signal();
-  onInitKeys = new Signal();
+  onInitState = new Signal();
 }
 
 export { Store };

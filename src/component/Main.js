@@ -37,6 +37,10 @@ class Main extends Element {
   
   init = (keys) => {
     this.board.init(keys);
+  };
+  
+  onChangeLang = (lang) => {
+    this.board.onChangeLang(lang);
   }
   
   onChangeTextareaContent = (content) => {
@@ -47,8 +51,8 @@ class Main extends Element {
     this.textarea.node.setSelectionRange(start, end);
   };
   
-  onInitKeys = (keys) => {
-    this.board.init(keys);
+  onInitState = ({ keys, lang }) => {
+    this.board.init({ keys, lang });
   }
 }
 

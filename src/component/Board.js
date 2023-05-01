@@ -43,7 +43,15 @@ class Board extends Element {
     }
   }
   
-  init = (keys) => {
+  onChangeLang = (lang) => {
+    this.lang = lang;
+    Object.keys(this.btns).forEach((code, index) => {
+      this.btns[code].update(this.keys[code][`${this.lang}`].name);
+    });
+  }
+  
+  init = ({ keys, lang }) => {
+    this.lang = lang;
     this.keys = keys;
     Object.keys(this.keys).forEach((key, index) => {
       const keyData = this.keys[key];

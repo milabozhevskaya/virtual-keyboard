@@ -16,7 +16,6 @@ class View extends Element {
         lang: 'en',
         controller,
     });
-    // this.header.node.onclick = () => this.controller.setFocusOnTextarea();
     this.main = new Main({
         parent: this.node,
         className: 'keyboard',
@@ -27,10 +26,18 @@ class View extends Element {
     document.addEventListener('click', () => this.main.setFocusOnTextarea());
     
     this.store.onChangeTextareaContent.add((content) => this.main.onChangeTextareaContent(content));
-    this.store.onChangeLang.add((lang) => this.header.onChangeLang(lang));
+    this.store.onChangeLang.add((lang) => {
+      console.log(lang)
+      this.header.onChangeLang(lang);
+      this.main.onChangeLang(lang);
+    });
     this.store.onChangeCursorPosition.add((position) => this.main.onChangeCursorPosition(position));
-    this.store.onInitKeys.add((keys) => this.main.onInitKeys(keys));
+    this.store.onInitState.add(({ keys, lang }) => {
+      this.header.onChangeLang(lang);
+      this.main.onInitState({ keys, lang })
+    });
   }
+  
   
   init = () => {
     const data = new DataApi();
