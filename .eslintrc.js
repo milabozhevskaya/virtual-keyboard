@@ -15,6 +15,5 @@ module.exports = {
     'import/prefer-default-export': 'off',
     "no-underscore-dangle": ["error", { "allowAfterThis": true }],
     "class-methods-use-this": ["error", { "exceptMethods": ["getLocalStorageData", "toLocalStorageData"]}]
-    // "class-methods-use-this": ["error", { "exceptMethods": ["toJson", "fromJson"] }]
   },
 };

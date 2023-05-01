@@ -51,7 +51,6 @@ class Editor {
         ...cursorPosition,
       };
     } else {
-      // если курсор внутри текста
       this.textareaContent = this.textareaContent.slice(0, number)
         + symbol + this.textareaContent.slice(number);
       this.textareaRow = this.prepareTextareaRow(this.textareaContent);

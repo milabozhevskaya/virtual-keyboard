@@ -31,22 +31,10 @@ class Controller {
   }
 
   controlCombinations = [
-    // ['Control', 'Delete'],
-    // ['Control', 'Backspace'],
     ['Control', 'KeyX'],
     ['Control', 'KeyC'],
     ['Control', 'KeyV'],
     ['Control', 'KeyZ'],
-    // ['Control', 'KeyS'],
-    // ['Control', 'KeyA'],
-    // ['Control', 'KeyB'],
-    // ['Control', 'KeyI'],
-    // ['Control', 'KeyU'],
-    // ['Control', 'BracketLeft'],
-    // ['Control', 'BracketRight'],
-    // ['Control', 'KeyL'],
-    // ['Control', 'KeyE'],
-    // ['Control', 'KeyR'],
     ['Control', 'KeyY'],
     ['Control', 'Shift'],
   ];
@@ -165,34 +153,20 @@ class Controller {
     this.store.textareaRow = this.editor.textareaRow;
     this.store.cursor = this.editor.cursor;
     this.newSymbol = '';
-    // const textareaContent = this.store.textareaContent + symbol;
-    // this.store.textareaContent = textareaContent;
   };
 
   mouseDown = (code, time) => {
     const lang = this.store.lang[this.store.langIndex];
     const key = this.store.getKeyContent(code);
     const { type } = key;
-    // this.activeBtns = this.store.activeBtns;
-    // this.lastControl = this.store.lastControl;
-    // this.activeControls = this.store.activeControls;
-    // this.lastKey = this.store.lastKey;
 
     if (type === 'control') {
       if ((this.lastControl.id && this.lastControl.id === code)
         && (this.lastControl.time && ((time - this.lastControl.time) < 300))) {
-        // если последняя контольная есть и совпадает с пришедшей
-        // и отличие во времени меньше 300 мсек
-        // то добавляем в активные контролы
         this.activeControls[code] = 1;
-        // возможно можно убрать - это активные бтны сохраняются
-        // также по коду
         this.activeBtns[code] = 1;
-        // также заменяем последнюю кнопку на пришедшую
         this.lastKey = code;
       } else if (!this.hasControls()) {
-        // если контрольных точек до этого еще не выбрано
-        // то просто записывает в последнюю контрльную
         this.lastControl = { id: code, time };
         this.activeBtns[code] = 1;
         this.lastKey = code;
@@ -206,8 +180,6 @@ class Controller {
         this.activeBtns[code] = 1;
         this.lastKey = code;
         this.lastControl = { id: code, time };
-        // здесь надо еще проверка на колво акт.контролов
-        // чтоб не превышала цепочка в 4 контрола, иначе сброс
       } else {
         this.resetControls();
         this.lastControl = { id: null, time: null };
@@ -229,7 +201,6 @@ class Controller {
         this.activeBtns[code] = 1;
       }
     } else {
-      // если нет выбранных контрольных
       this.lastControl = { id: null, time: null };
       this.lastKey = code;
       this.activeBtns[code] = 1;
@@ -470,12 +441,6 @@ class Controller {
       }
     }
     this.store.activeBtns = this.activeBtns;
-
-    // if (!(type === 'control' || type === 'capslock' || type === 'meta')
-    // && this.isSelectedText && !this.isCopiedText) {
-    //   // this.selectedTextRange = null;
-    //   this.isSelectedText = false;
-    // }
   };
 
   upCursor = () => {
@@ -529,10 +494,6 @@ class Controller {
       } else {
         newNumber += textareaRow[newLine].length - 1;
         const newPos = textareaRow[newLine].length - 1;
-        // if (newLine !== textareaRow.length - 1) {
-        //   // newNumber -= 1;
-        //   // newPos -= 1;
-        // }
         this.store.cursor = {
           number: newNumber,
           line: newLine,

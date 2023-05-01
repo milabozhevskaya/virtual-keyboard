@@ -73,12 +73,6 @@ class Board extends Element {
         content: keyData[`${this.lang}`].name,
         controller: this.controller.keyHandler,
       });
-      // this.btns.push(new Button({
-      //   parent: this.rows[row - 1].node,
-      //   className: `board`,
-      //   lang: this.lang,
-      //   data: btn,
-      // }));
     });
   };
 }

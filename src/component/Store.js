@@ -32,12 +32,6 @@ class Store {
   set maxLengthOfTextarea(newLength) {
     this._maxLengthOfTextarea = newLength;
     this.onChangeLengthOfTextarea.emit(this._maxLengthOfTextarea);
-    // this.onChangeLocalStorageData.emit({
-    //   lang: this.langMap[this.langIndex],
-    //   textareaContent: this.textareaContent,
-    //   textareaRow: this.textareaRow,
-    //   cursor: this.cursor,
-    // });
   }
   get cursor() {
     return this._cursor;
@@ -49,12 +43,6 @@ class Store {
       start: this._cursor.number,
       end: this._cursor.number,
     });
-    // this.onChangeLocalStorageData.emit({
-    //   lang: this.langMap[this.langIndex],
-    //   textareaContent: this.textareaContent,
-    //   textareaRow: this.textareaRow,
-    //   cursor: this.cursor,
-    // });
   }
 
   get textareaRow() {
@@ -63,12 +51,6 @@ class Store {
 
   set textareaRow(textareaRow) {
     this._textareaRow = textareaRow;
-    // this.onChangeLocalStorageData.emit({
-    //   lang: this.langMap[this.langIndex],
-    //   textareaContent: this.textareaContent,
-    //   textareaRow: this.textareaRow,
-    //   cursor: this.cursor,
-    // });
   }
 
   get() {
@@ -82,12 +64,6 @@ class Store {
   set textareaContent(content) {
     this._textareaContent = content;
     this.onChangeTextareaContent.emit(this._textareaContent);
-    // this.onChangeLocalStorageData.emit({
-    //   lang: this.langMap[this.langIndex],
-    //   textareaContent: this.textareaContent,
-    //   textareaRow: this.textareaRow,
-    //   cursor: this.cursor,
-    // });
   }
 
   get keys() {

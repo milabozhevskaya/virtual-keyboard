@@ -11,6 +11,7 @@ class View extends Element {
     this.node.onresize = () => {
       const maxLengthOfTextarea = window.innerWidth >= 1080 ? 77 : window.innerWidth >= 851 ? 60 : window.innerWidth >= 768 ? 52 : 30;
       this.controller.onResize(maxLengthOfTextarea);
+      this.main.setFocusOnTextarea();
     };
 
     this.data = [];
@@ -53,9 +54,6 @@ class View extends Element {
       this.data = loaded;
       this.controller.initKeyboard(this.data);
     });
-    // .then(() => {
-    //   this.main.init(this.data);
-    // });
   };
 }
 

@@ -25,12 +25,6 @@ class Main extends Element {
       lang: 'en',
       controller: this.controller.boardHandler,
     });
-    // this.node.onmousedown = (event) => {
-    //   this.textarea.node.focus();
-    // };
-    // this.node.onmouseup = (event) => {
-    //   this.textarea.node.focus();
-    // }
   }
 
   setFocusOnTextarea = () => this.textarea.node.focus();
