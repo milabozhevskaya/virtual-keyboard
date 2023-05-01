@@ -15,6 +15,16 @@
   margin-bottom: 20px;
   resize: none;
   white-space: pre-wrap;
+  
+  @include desctops {
+    width: 800px;
+  }
+  @include tablets {
+    width: 700px;
+  }
+  @include phones {
+    width: 550px;
+  }
 }
 
 .textarea::-webkit-scrollbar {

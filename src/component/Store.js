@@ -13,6 +13,7 @@ class Store {
     this._activeControls = {};
     this._lastKey = null;
     this._capsLock = false;
+    this._maxLengthOfTextarea = 77;
   }
 
   setInitState({ keys, langIndex }) {
@@ -20,10 +21,24 @@ class Store {
     this._keys = keys;
     this.onInitState.emit({
       keys,
-      lang: this._langMap[langIndex],
+      lang: this._langMap[this._langIndex],
     });
   }
 
+  get maxLengthOfTextarea() {
+    return this._maxLengthOfTextarea;
+  }
+
+  set maxLengthOfTextarea(newLength) {
+    this._maxLengthOfTextarea = newLength;
+    this.onChangeLengthOfTextarea.emit(this._maxLengthOfTextarea);
+    // this.onChangeLocalStorageData.emit({
+    //   lang: this.langMap[this.langIndex],
+    //   textareaContent: this.textareaContent,
+    //   textareaRow: this.textareaRow,
+    //   cursor: this.cursor,
+    // });
+  }
   get cursor() {
     return this._cursor;
   }
@@ -153,6 +168,8 @@ class Store {
 
   onChangeActiveBtns = new Signal();
 
+  onChangeLengthOfTextarea = new Signal();
+  
   onChangeLocalStorageData = new Signal();
 
   onChangeTextareaContent = new Signal();

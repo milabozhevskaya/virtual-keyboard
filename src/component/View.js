@@ -8,6 +8,11 @@ class View extends Element {
     super({ parent, className: 'keyboard' });
     this.controller = controller;
     this.store = store;
+    this.node.onresize = () => {
+      const maxLengthOfTextarea = window.innerWidth >= 1080 ? 77 : window.innerWidth >= 851 ? 60 : window.innerWidth >= 768 ? 52 : 30;
+      this.controller.onResize(maxLengthOfTextarea);
+    };
+
     this.data = [];
     this.keys = [];
     this.header = new Header({

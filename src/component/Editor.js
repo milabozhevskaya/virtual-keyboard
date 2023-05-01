@@ -16,12 +16,21 @@ class Editor {
       if (row.length <= this.maxRowLength) return row;
       const arr = [];
       let restString = row;
-      while (restString.length > 77) {
-        const rows = restString.match(/.{1,77}/g);
+      while (restString.length > this.maxRowLength) {
+        const rows = this.maxRowLength === 77
+          ? restString.match(/.{1,77}/g)
+          : this.maxRowLength === 60
+            ? restString.match(/.{1,60}/g)
+            : this.maxRowLength === 52
+              ? restString.match(/.{1,52}/g)
+              : restString.match(/.{1,30}/g);
         const lastSpaceIndex = rows[0].lastIndexOf(' ');
         if (lastSpaceIndex !== -1) {
           arr.push(restString.slice(0, lastSpaceIndex + 1));
           restString = string.slice(lastSpaceIndex + 1);
+        } else {
+          arr.push(rows[0].slice(0, -1));
+          restString = string.slice(this.maxRowLength - 1);
         }
       }
       arr.push(restString);

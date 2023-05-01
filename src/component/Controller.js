@@ -19,6 +19,7 @@ class Controller {
       backupTextareaRow: [''],
     });
     this.localStorageData = this.getLocalStorageData();
+    this.maxLengthOfTextarea = window.innerWidth >= 1080 ? 77 : window.innerWidth >= 851 ? 60 : window.innerWidth >= 768 ? 52 : 30;
     this.activeBtns = {};
     this.lastControl = { id: null, time: null };
     this.activeControls = {};
@@ -94,6 +95,7 @@ class Controller {
     this.editor.textareaContent = this.store.textareaContent;
     this.editor.textareaRow = this.store.textareaRow;
     this.editor.cursor = this.store.cursor;
+    this.editor.maxRowLength = this.store.maxLengthOfTextarea;
     this.executeCommand(new Delete(this, this.editor));
     this.store.textareaContent = this.editor.textareaContent;
     this.store.textareaRow = this.editor.textareaRow;
@@ -119,6 +121,7 @@ class Controller {
       this.editor.textareaContent = this.store.textareaContent;
       this.editor.textareaRow = this.store.textareaRow;
       this.editor.cursor = this.store.cursor;
+      this.editor.maxRowLength = this.store.maxLengthOfTextarea;
       this.editor.setCursorPosition(
         (direction === 'left' || direction === 'up')
           ? start : end,
@@ -141,6 +144,7 @@ class Controller {
       this.editor.textareaContent = this.store.textareaContent;
       this.editor.textareaRow = this.store.textareaRow;
       this.editor.cursor = this.store.cursor;
+      this.editor.maxRowLength = this.store.maxLengthOfTextarea;
       this.executeCommand(new Replace(this, this.editor));
       this.store.textareaContent = this.editor.textareaContent;
       this.store.textareaRow = this.editor.textareaRow;
@@ -155,6 +159,7 @@ class Controller {
     this.editor.textareaContent = this.store.textareaContent;
     this.editor.textareaRow = this.store.textareaRow;
     this.editor.cursor = this.store.cursor;
+    this.editor.maxRowLength = this.store.maxLengthOfTextarea;
     this.executeCommand(new Add(this, this.editor));
     this.store.textareaContent = this.editor.textareaContent;
     this.store.textareaRow = this.editor.textareaRow;
@@ -309,6 +314,7 @@ class Controller {
         if (this.controlCombinations[i].join('') === 'ControlKeyX' && this.isSelectedText) {
           this.editor.textareaContent = this.store.textareaContent;
           this.editor.selectPosition = this.selectedTextRange;
+          this.editor.maxRowLength = this.store.maxLengthOfTextarea;
           this.executeCommand(new Cut(this, this.editor));
           this.store.textareaContent = this.editor.textareaContent;
           this.store.textareaRow = this.editor.textareaRow;
@@ -324,6 +330,7 @@ class Controller {
           this.editor.textareaContent = this.store.textareaContent;
           this.editor.textareaRow = this.store.textareaRow;
           this.editor.cursor = this.store.cursor;
+          this.editor.maxRowLength = this.store.maxLengthOfTextarea;
 
           if (this.isSelectedText) {
             this.executeCommand(new Replace(this, this.editor));
@@ -368,6 +375,7 @@ class Controller {
       if (this.isSelectedText) {
         this.isSelectedText = false;
         this.isCopiedText = false;
+        this.editor.maxRowLength = this.store.maxLengthOfTextarea;
         this.setCursorFromTextarea(this.selectedTextRange.end);
         this.store.cursor = this.editor.cursor;
         this.selectedTextRange = null;
@@ -402,6 +410,7 @@ class Controller {
           if (this.isSelectedText) {
             this.isSelectedText = false;
             this.isCopiedText = false;
+            this.editor.maxRowLength = this.store.maxLengthOfTextarea;
             this.setCursorFromTextarea(this.selectedTextRange.end);
             this.store.cursor = this.editor.cursor;
             this.selectedTextRange = null;
@@ -417,6 +426,7 @@ class Controller {
         if (this.isSelectedText) {
           this.isSelectedText = false;
           this.isCopiedText = false;
+          this.editor.maxRowLength = this.store.maxLengthOfTextarea;
           this.setCursorFromTextarea(this.selectedTextRange.end);
           this.store.cursor = this.editor.cursor;
           this.selectedTextRange = null;
@@ -436,6 +446,7 @@ class Controller {
       if (this.isSelectedText) {
         this.isSelectedText = false;
         this.isCopiedText = false;
+        this.editor.maxRowLength = this.store.maxLengthOfTextarea;
         this.setCursorFromTextarea(this.selectedTextRange.end);
         this.store.cursor = this.editor.cursor;
         this.selectedTextRange = null;
@@ -593,6 +604,7 @@ class Controller {
     this.editor.textareaContent = this.store.textareaContent;
     this.editor.textareaRow = this.store.textareaRow;
     this.editor.cursor = this.store.cursor;
+    this.editor.maxRowLength = this.store.maxLengthOfTextarea;
     this.editor.setCursorPosition(number);
     this.store.cursor = this.editor.cursor;
     if (this.isSelectedText) {
@@ -636,6 +648,22 @@ class Controller {
   boardHandler = {
     keyHandler: this.keyHandler,
   };
+  
+  onResize = (maxLengthOfTextarea) => {
+    this.maxLengthOfTextarea = maxLengthOfTextarea;
+    this.store.maxLengthOfTextarea = maxLengthOfTextarea;
+    this.editor.textareaContent = this.store.textareaContent;
+    this.editor.maxRowLength = this.store.maxLengthOfTextarea;
+    this.store.textareaRow = this.editor.prepareTextareaRow(this.store.textareaContent);
+    this.editor.textareaRow = this.store.textareaRow;
+    this.editor.setCursorPosition(this.store.cursor.number);
+    this.store.cursor = this.editor.cursor;
+    if (this.isSelectedText) {
+      this.selectedTextRange = null;
+      this.isSelectedText = false;
+      this.isCopiedText = false;
+    }
+  }
 
   initKeyboard = (data) => {
     const keys = {};
@@ -644,9 +672,11 @@ class Controller {
         ...key,
       };
     });
+    const langIndexInStore = this.store.lang.indexOf(this.localStorageData.lang);
     this.store.setInitState({
       keys,
-      langIndex: this.store.lang.indexOf(this.localStorageData.lang),
+      langIndex: langIndexInStore > -1 ? langIndexInStore : 0,
+      maxLengthOfTextarea: this.maxLengthOfTextarea,
     });
   };
 

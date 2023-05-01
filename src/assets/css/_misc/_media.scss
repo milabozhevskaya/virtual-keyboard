@@ -2,8 +2,13 @@
   @return $px / 16px + 0rem;
 }
 
+@mixin desctops {
+  @media screen and (max-width: 1079.9px) {//без 1280 -- 768-1279
+    @content;
+  }
+}
 @mixin tablets {
-  @media screen and (max-width: 1279.9px) {//без 1280 -- 768-1279
+  @media screen and (max-width: 850.9px) {//без 1280 -- 768-1279
     @content;
   }
 }
