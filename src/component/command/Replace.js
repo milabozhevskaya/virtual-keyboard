@@ -1,13 +1,13 @@
 import { Command } from './Command.js';
 
-class Cut extends Command {
+class Replace extends Command {
   constructor(controller, editor) {
     super(controller, editor, () => {
-      editor.cutSelect(controller.selectedTextRange.start, controller.selectedTextRange.end);
+      editor.replaceSelect(controller.selectedTextRange.start, controller.selectedTextRange.end, controller.newSymbol);
       this.saveBackup();
       return true;
     });
   }
 }
 
-export { Cut };
+export { Replace };

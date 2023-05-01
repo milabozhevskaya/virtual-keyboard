@@ -1,10 +1,12 @@
+import { Buffer } from './Buffer';
 class Editor {
   constructor() {
     this.textareaContent = '';
-    this.selectText = '';
     this.textareaRow = [];
     this.cursor = { line: 0, pos: 0, number: 0 };
     this.maxRowLength = 77;
+    this.buffer = new Buffer();
+    this.selectPosition = null;
   }
   prepareTextareaRow = (string) => {
     const splitText = string.split('\n').map((row) => `${row}\n`);
@@ -42,9 +44,9 @@ class Editor {
       const newTextareaContent = this.textareaContent + symbol;
       this.textareaContent = newTextareaContent;
       this.textareaRow = this.prepareTextareaRow(this.textareaContent);
-      const cursorPosition = this.findCursorPosition(number + 1);
+      const cursorPosition = this.findCursorPosition(number + symbol.length);
       this.cursor = {
-        number: number + 1,
+        number: number + symbol.length,
         ...cursorPosition,
       }
 
@@ -75,9 +77,9 @@ class Editor {
       // если курсор внутри текста
       this.textareaContent = this.textareaContent.slice(0, number) + symbol + this.textareaContent.slice(number);
       this.textareaRow = this.prepareTextareaRow(this.textareaContent);
-      const cursorPosition = this.findCursorPosition(number + 1);
+      const cursorPosition = this.findCursorPosition(number + symbol.length);
       this.cursor = {
-        number: number + 1,
+        number: number + symbol.length,
         ...cursorPosition,
       }
       // if (symbol === '\n') {
@@ -95,6 +97,13 @@ class Editor {
       // }
     }
   }
+  
+  setCursorPosition = (number) => {
+    this.cursor = {
+      number,
+      ...this.findCursorPosition(number),
+    };
+  };
   
   findCursorPosition = (number) => {
     let sumOfRowsLengths = 0;
@@ -123,21 +132,6 @@ class Editor {
           pos: (this.textareaRow[this.textareaRow.length - 1].length),
         };
   
-        // if (pos !== 0) {
-        //   this.textareaContent = this.textareaContent.slice(0, this.textareaContent.length - 1);
-        //   this.textareaRow[line] = this.textareaRow[line].slice(0, this.textareaRow[line].length - 1);
-        //   this.cursor = { line, pos: (pos - 1), number: (number - 1) };
-        // } else if (line !== 0) {
-        //   this.textareaContent = this.textareaContent.slice(0, this.textareaContent.length - 1);
-        //   this.textareaRow[line - 1] = this.textareaRow[line - 1]
-        //     .slice(0, this.textareaRow[line - 1].length - 1);
-        //   this.textareaRow.pop();
-        //   this.cursor = {
-        //     line: (line - 1),
-        //     pos: this.textareaRow[line - 1].length - 1,
-        //     number: (number - 1),
-        //   };
-        // }
       }
     } else if (direction === 'prev') {
       if (number !== 0) {
@@ -160,17 +154,44 @@ class Editor {
         };
       }
     }
-    console.log(this.cursor)
     
   };
 
-  // getSelect() {
-  //   return this.selectText;
-  // }
+  replaceSelect(startSelect, endSelect, part) {
+    const start = Math.min(startSelect, endSelect);
+    const end = Math.max(startSelect, endSelect);
+    this.textareaContent = this.textareaContent.slice(0, start) + part + this.textareaContent.slice(end);
+    this.textareaRow = this.prepareTextareaRow(this.textareaContent);
 
-  // deleteSelect() {
-  //   this.selectText = '';
-  // }
+    const cursorPosition = this.findCursorPosition(start + part.length);
+    this.cursor = {
+      number: start + part.length,
+      ...cursorPosition,
+    };
+
+  }
+  
+  saveSelect = (startSelect, endSelect) => {
+    const start = Math.min(startSelect, endSelect);
+    const end = Math.max(startSelect, endSelect);
+    const copyText = this.textareaContent.slice(start, end);
+    this.buffer.push(copyText);
+  }
+
+  cutSelect = (startSelect, endSelect) => {
+    const start = Math.min(startSelect, endSelect);
+    const end = Math.max(startSelect, endSelect);
+    const cutText = this.textareaContent.slice(start, end);
+    this.buffer.push(cutText);
+    this.textareaContent = this.textareaContent.slice(0, start) + this.textareaContent.slice(end);
+    this.textareaRow = this.prepareTextareaRow(this.textareaContent);
+
+    const cursorPosition = this.findCursorPosition(start);
+    this.cursor = {
+      number: start,
+      ...cursorPosition,
+    };
+  }
 
   // replaceSelect(selectText) {
   //   this.selectText = selectText;

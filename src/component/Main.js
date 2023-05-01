@@ -17,6 +17,7 @@ class Main extends Element {
     this.textarea = new Textarea({
         parent: this.container.node,
         className,
+        controller: controller.textareaHandler,
     });
     this.board = new Board({
         parent: this.container.node,
@@ -24,13 +25,15 @@ class Main extends Element {
         lang: 'en',
         controller: this.controller.boardHandler,
     });
-    this.node.onmousedown = (event) => {
-      this.textarea.node.focus();
-    };
-    this.node.onmouseup = (event) => {
-      this.textarea.node.focus();
-    }
+    // this.node.onmousedown = (event) => {
+    //   this.textarea.node.focus();
+    // };
+    // this.node.onmouseup = (event) => {
+    //   this.textarea.node.focus();
+    // }
   }
+  
+  setFocusOnTextarea = () => this.textarea.node.focus();
   
   init = (keys) => {
     this.board.init(keys);

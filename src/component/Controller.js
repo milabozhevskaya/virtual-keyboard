@@ -2,12 +2,15 @@ import { Editor } from "./Editor";
 import { Add } from './command/Add';
 import { Delete } from './command/Delete';
 import { History } from "./EditHistory";
+import { Copy } from "./command/Copy";
+import { Replace } from "./command/Replace";
+import { Cut } from "./command/Cut";
+import { Paste } from "./command/Paste";
 
 class Controller {
   constructor(store) {
     this.store = store;
     this.editor = new Editor();
-    // this.cursor = new Cursor(this.state);
     this.history = new History({
       backupTextareaContent: '',
       backupCursor: { line: 0, pos: 0, number: 0 },
@@ -18,25 +21,26 @@ class Controller {
     this.activeControls = {};
     this.lastKey = null;
     this.newSymbol = null;
+    this.selectedTextRange = null;
   }
 
   controlCombinations = [
-    ['Control', 'Delete'],
-    ['Control', 'Backspace'],
+    // ['Control', 'Delete'],
+    // ['Control', 'Backspace'],
     ['Control', 'KeyX'],
     ['Control', 'KeyC'],
     ['Control', 'KeyV'],
     ['Control', 'KeyZ'],
-    ['Control', 'KeyS'],
-    ['Control', 'KeyA'],
-    ['Control', 'KeyB'],
-    ['Control', 'KeyI'],
-    ['Control', 'KeyU'],
-    ['Control', 'BracketLeft'],
-    ['Control', 'BracketRight'],
-    ['Control', 'KeyL'],
-    ['Control', 'KeyE'],
-    ['Control', 'KeyR'],
+    // ['Control', 'KeyS'],
+    // ['Control', 'KeyA'],
+    // ['Control', 'KeyB'],
+    // ['Control', 'KeyI'],
+    // ['Control', 'KeyU'],
+    // ['Control', 'BracketLeft'],
+    // ['Control', 'BracketRight'],
+    // ['Control', 'KeyL'],
+    // ['Control', 'KeyE'],
+    // ['Control', 'KeyR'],
     ['Control', 'KeyY'],
     ['Control', 'Shift'],
   ];
@@ -84,12 +88,48 @@ class Controller {
 
   moveCursor = (code) => {
     const direction = code.slice(5).toLowerCase();
+    if (this.isSelectedText) {
+      
+      const start = Math.min(this.selectedTextRange.start, this.selectedTextRange.end);
+      const end = Math.max(this.selectedTextRange.start, this.selectedTextRange.end);
+      
+      this.editor.textareaContent = this.store.textareaContent;
+      this.editor.textareaRow = this.store.textareaRow;
+      this.editor.cursor = this.store.cursor;
+      this.editor.setCursorPosition(
+        (direction === 'left' || direction === 'up')
+          ? start : end
+      );
+      this.store.cursor = this.editor.cursor;
+      this.isSelectedText = false;
+      this.isCopiedText = false;
+      this.selectedTextRange = null;
+      if (direction === 'left' || direction === 'right') return true;;
+    }
+
     this.cursorHandler[direction]();
     return true;
   }
 
   add = (symbol) => {
     this.newSymbol = symbol;
+
+    if (this.isSelectedText) {
+      
+      this.editor.textareaContent = this.store.textareaContent;
+      this.editor.textareaRow = this.store.textareaRow;
+      this.editor.cursor = this.store.cursor;
+      this.executeCommand(new Replace(this, this.editor));
+      this.store.textareaContent = this.editor.textareaContent;
+      this.store.textareaRow = this.editor.textareaRow;
+      this.store.cursor = this.editor.cursor;
+      this.isSelectedText = false;
+      this.isCopiedText = false;
+      this.selectedTextRange = null;
+      this.newSymbol = '';
+      return;
+    }
+
     this.editor.textareaContent = this.store.textareaContent;
     this.editor.textareaRow = this.store.textareaRow;
     this.editor.cursor = this.store.cursor;
@@ -210,6 +250,11 @@ class Controller {
       }
     }
     this.store.activeBtns = this.activeBtns;
+    
+    if (!(type === 'control' || type === 'capslock' || type === 'meta') && this.isSelectedText && !this.isCopiedText) {
+      // this.selectedTextRange = null;
+      this.isSelectedText = false;
+    }
   }
 
   resetControls = () => { this.activeControls = {}; };
@@ -233,6 +278,12 @@ class Controller {
           // localStorage.setItem('key_lang', lang);
         }
         if (this.controlCombinations[i].join('') === 'ControlKeyZ') {
+          if (this.isSelectedText) {
+            this.isSelectedText = false;
+            this.isCopiedText = false;
+            this.selectedTextRange = null;
+          }
+      
           const backCommand = this.history.back();
           if (backCommand) {
             this.store.textareaContent = backCommand.backupTextareaContent;
@@ -241,12 +292,63 @@ class Controller {
           }
         }
         if (this.controlCombinations[i].join('') === 'ControlKeyY') {
+          if (this.isSelectedText) {
+            this.isSelectedText = false;
+            this.isCopiedText = false;
+            this.selectedTextRange = null;
+          }
+
           const backCommand = this.history.next();
           if (backCommand) {
             this.store.textareaContent = backCommand.backupTextareaContent;
             this.store.cursor = backCommand.backupCursor;
             this.store.textareaRow = backCommand.textareaRow;
           }
+        }
+        if (this.controlCombinations[i].join('') === 'ControlKeyX' && this.isSelectedText) {
+          this.editor.textareaContent = this.store.textareaContent;
+          this.editor.selectPosition = this.selectedTextRange;
+          this.executeCommand(new Cut(this, this.editor));
+          this.store.textareaContent = this.editor.textareaContent;
+          this.store.textareaRow = this.editor.textareaRow;
+          this.store.cursor = this.editor.cursor;
+      
+          this.isSelectedText = false;
+          this.isCopiedText = false;
+          this.selectedTextRange = null;
+        }
+        if (this.controlCombinations[i].join('') === 'ControlKeyV') {
+          this.newSymbol = this.editor.buffer.getLast();
+          this.editor.textareaContent = this.store.textareaContent;
+          this.editor.textareaRow = this.store.textareaRow;
+          this.editor.cursor = this.store.cursor;
+          
+          if (this.isSelectedText) {
+            
+            this.executeCommand(new Replace(this, this.editor));
+            this.store.textareaContent = this.editor.textareaContent;
+            this.store.textareaRow = this.editor.textareaRow;
+            this.store.cursor = this.editor.cursor;
+            this.isSelectedText = false;
+            this.isCopiedText = false;
+            this.selectedTextRange = null;
+            return;
+          }
+      
+          this.executeCommand(new Paste(this, this.editor));
+          this.store.textareaContent = this.editor.textareaContent;
+          this.store.textareaRow = this.editor.textareaRow;
+          this.store.cursor = this.editor.cursor;
+      
+          this.isSelectedText = false;
+          this.isCopiedText = false;
+          this.selectedTextRange = null;
+          this.newSymbol = '';
+        }
+        if (this.controlCombinations[i].join('') === 'ControlKeyC' && this.isSelectedText) {
+          this.editor.textareaContent = this.store.textareaContent;
+          this.executeCommand(new Copy(this, this.editor));
+          this.isCopiedText = true;
         }
         return this.controlCombinations[i];
       }
@@ -283,13 +385,32 @@ class Controller {
       if (this.hasControlCombination(code)) {
         this.activeBtns[code] = 1;
       } else {
-        if (type === 'meta' || !this.editMap[type]);
-        else this.editMap[type](code, key[lang]);
+        if (this.isSelectedText) {
+          this.isSelectedText = false;
+          this.isCopiedText = false;
+          this.setCursorFromTextarea(this.selectedTextRange.end);
+          this.store.cursor = this.editor.cursor;
+          this.selectedTextRange = null;
+          this.isSelectedText = false;
+          this.isCopiedText = false;
+        }
+        // if (type === 'meta' || !this.editMap[type]);
+        // else this.editMap[type](code, key[lang]);
         this.activeBtns[code] = 1;
       }
     } else {
       this.activeBtns[code] = 1;
-      if (type === 'meta' || !this.editMap[type]);
+      if (type === 'meta' || !this.editMap[type]) {
+        if (this.isSelectedText) {
+          this.isSelectedText = false;
+          this.isCopiedText = false;
+          this.setCursorFromTextarea(this.selectedTextRange.end);
+          this.store.cursor = this.editor.cursor;
+          this.selectedTextRange = null;
+          this.isSelectedText = false;
+          this.isCopiedText = false;
+        }
+      }
       else this.editMap[type](code, key[lang]);
     }
     this.store.activeBtns = this.activeBtns;
@@ -317,10 +438,14 @@ class Controller {
       }
     }
     this.store.activeBtns = this.activeBtns;
+    
+    if (!(type === 'control' || type === 'capslock' || type === 'meta') && this.isSelectedText && !this.isCopiedText) {
+      // this.selectedTextRange = null;
+      this.isSelectedText = false;
+    }
   }
 
   upCursor = () => {
-    console.log(this.store.cursor)
     const { line, pos, number } = this.store.cursor;
     const textareaRow = this.store.textareaRow;
     if (line !== 0) {
@@ -350,12 +475,10 @@ class Controller {
       }
 
     }
-    console.log(this.store.cursor)
 
   };
 
   downCursor = () => {
-    console.log(this.store.cursor);
     const { line, pos, number } = this.store.cursor;
     const textareaRow = this.store.textareaRow;
 
@@ -386,7 +509,6 @@ class Controller {
         };
       }
     }
-    console.log(this.store.cursor);
 
   };
 
@@ -448,6 +570,25 @@ class Controller {
       };
 
     }
+  };
+  
+  setCursorFromTextarea = (number) => {
+    this.editor.textareaContent = this.store.textareaContent;
+    this.editor.textareaRow = this.store.textareaRow;
+    this.editor.cursor = this.store.cursor;
+    this.editor.setCursorPosition(number)
+    this.store.cursor = this.editor.cursor;
+    if (this.isSelectedText) {
+      this.selectedTextRange = null;
+      this.isSelectedText = false;
+      this.isCopiedText = false; 
+    }
+  };
+  
+  selectTextRange = (start, end) => {
+    if (this.selectedTextRange) this.selectedTextRange = null;
+    this.selectedTextRange =  { start, end };
+    this.isSelectedText = true;
   }
 
   editMap = {
@@ -456,6 +597,11 @@ class Controller {
     'move': this.moveCursor,
     'capslock': this.capsLock,
     'space': this.space,
+  };
+  
+  textareaHandler = {
+    setCursorPosition:  this.setCursorFromTextarea,
+    selectTextRange: this.selectTextRange,
   }
 
   cursorHandler = {
