@@ -19,7 +19,10 @@ class Controller {
       backupTextareaRow: [''],
     });
     this.localStorageData = this.getLocalStorageData();
-    this.maxLengthOfTextarea = window.innerWidth >= 1080 ? 77 : window.innerWidth >= 851 ? 60 : window.innerWidth >= 768 ? 52 : 30;
+    const isFull = window.innerWidth >= 1080 ? 77 : false;
+    const isDesctop = window.innerWidth >= 851 ? 60 : false;
+    const isTablet = window.innerWidth >= 768 ? 52 : 30;
+    this.maxLengthOfTextarea = isFull || isDesctop || isTablet;
     this.activeBtns = {};
     this.lastControl = { id: null, time: null };
     this.activeControls = {};
@@ -609,8 +612,9 @@ class Controller {
   boardHandler = {
     keyHandler: this.keyHandler,
   };
-  
+
   onResize = (maxLengthOfTextarea) => {
+    if (this.maxLengthOfTextarea === maxLengthOfTextarea) return;
     this.maxLengthOfTextarea = maxLengthOfTextarea;
     this.store.maxLengthOfTextarea = maxLengthOfTextarea;
     this.editor.textareaContent = this.store.textareaContent;
@@ -624,7 +628,7 @@ class Controller {
       this.isSelectedText = false;
       this.isCopiedText = false;
     }
-  }
+  };
 
   initKeyboard = (data) => {
     const keys = {};

@@ -17,13 +17,10 @@ class Editor {
       const arr = [];
       let restString = row;
       while (restString.length > this.maxRowLength) {
-        const rows = this.maxRowLength === 77
-          ? restString.match(/.{1,77}/g)
-          : this.maxRowLength === 60
-            ? restString.match(/.{1,60}/g)
-            : this.maxRowLength === 52
-              ? restString.match(/.{1,52}/g)
-              : restString.match(/.{1,30}/g);
+        const isFull = this.maxRowLength === 77 ? restString.match(/.{1,77}/g) : false;
+        const isDesctop = this.maxRowLength === 60 ? restString.match(/.{1,60}/g) : false;
+        const isTablet = this.maxRowLength === 52 ? restString.match(/.{1,52}/g) : restString.match(/.{1,30}/g);
+        const rows = isFull || isDesctop || isTablet;
         const lastSpaceIndex = rows[0].lastIndexOf(' ');
         if (lastSpaceIndex !== -1) {
           arr.push(restString.slice(0, lastSpaceIndex + 1));

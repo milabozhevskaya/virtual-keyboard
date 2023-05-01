@@ -33,6 +33,7 @@ class Store {
     this._maxLengthOfTextarea = newLength;
     this.onChangeLengthOfTextarea.emit(this._maxLengthOfTextarea);
   }
+
   get cursor() {
     return this._cursor;
   }
@@ -145,7 +146,7 @@ class Store {
   onChangeActiveBtns = new Signal();
 
   onChangeLengthOfTextarea = new Signal();
-  
+
   onChangeLocalStorageData = new Signal();
 
   onChangeTextareaContent = new Signal();

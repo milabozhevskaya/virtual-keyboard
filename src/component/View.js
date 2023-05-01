@@ -9,7 +9,10 @@ class View extends Element {
     this.controller = controller;
     this.store = store;
     this.node.onresize = () => {
-      const maxLengthOfTextarea = window.innerWidth >= 1080 ? 77 : window.innerWidth >= 851 ? 60 : window.innerWidth >= 768 ? 52 : 30;
+      const isFull = window.innerWidth >= 1080 ? 77 : false;
+      const isDesctop = window.innerWidth >= 851 ? 60 : false;
+      const isTablet = window.innerWidth >= 768 ? 52 : 30;
+      const maxLengthOfTextarea = isFull || isDesctop || isTablet;
       this.controller.onResize(maxLengthOfTextarea);
       this.main.setFocusOnTextarea();
     };
