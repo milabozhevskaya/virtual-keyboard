@@ -1,0 +1,25 @@
+.board {
+  @include dflex(js, cn, column);
+  row-gap: 8px;
+  width: 90%;
+  max-width: 1280px;
+
+  &__row {
+    @include dflex(cn, cn, row);
+    column-gap: 8px;
+
+    &:last-child {
+      padding-right: 30px;
+    }
+
+    &:first-child {
+      .btn {
+        &:first-child {
+          .btn__before {
+            top: 12px;
+          }
+        }
+      }
+    }
+  }
+}
